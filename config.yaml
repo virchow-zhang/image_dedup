@@ -1,0 +1,37 @@
+scan:
+  directory: null
+  recursive: true
+  extensions:
+    - ".tif"
+    - ".tiff"
+    - ".jpg"
+    - ".jpeg"
+    - ".png"
+    - ".bmp"
+
+grouping:
+  patterns:
+    - name: "subdir_fov"
+      fov_regex: "(?P<group>[^/]+)/(?P<fov>\\d+_\\d+)/"
+      channel_regex: "_(?P<channel>CH\\d+|Overlay)\\."
+  cross_channel:
+    phash_boost: 0.6
+    ssim_boost: 1.1
+
+detection:
+  phash_threshold: 3
+  phash_hash_size: 16
+  ssim_threshold: 0.98
+  hist_threshold: 0.9999
+  hist_enabled: false
+  orb_enabled: true
+  orb_min_matches: 10
+  orb_max_features: 2000
+  edge_threshold: 0.55
+  subimage_threshold: 0.85
+  max_workers: 0
+
+report:
+  output_dir: "dedup_report"
+  clean_output: true
+  thumbnail_height: 500
