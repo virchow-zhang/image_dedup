@@ -15,6 +15,7 @@ from detectors.transform import TransformDetector
 from detectors.feature_match import FeatureMatchDetector
 from detectors.edge_overlap import EdgeOverlapDetector
 from detectors.subimage import SubimageDetector
+from detectors.fov_overlap import FovOverlapDetector, FovOverlapMatch
 
 
 def _build_fast_dets(cfg: dict):
@@ -134,9 +135,35 @@ def run_detection(directory: str, config: dict) -> tuple[list[ImageInfo], list[M
 
                 unique.sort(key=lambda m: (_sev_rank(m.severity), -m.similarity))
 
-    print(f"\nTotal: {len(unique)} matches")
+    fov_matches = []
+    fov_cfg = det_cfg.get("fov_overlap", {})
+    if fov_cfg.get("enabled", True):
+        fov_det = FovOverlapDetector(det_cfg)
+        same_ch_pairs = []
+        info_map = {info.path: info for info in infos}
+        for info_a, info_b in combinations(infos, 2):
+            gi1, gi2 = info_a.group_info, info_b.group_info
+            if gi1.get("channel") and gi2.get("channel") and gi1["channel"] == gi2["channel"]:
+                same_ch_pairs.append((info_a, info_b))
+        print(f"Running FOV overlap detection on {len(same_ch_pairs)} same-channel pairs...")
+        for i, (info_a, info_b) in enumerate(same_ch_pairs):
+            relation = compute_pair_relation(info_a.group_info, info_b.group_info)
+            try:
+                r = fov_det.compare(info_a, info_b, relation)
+                if r is not None:
+                    fov_matches.append(r)
+            except Exception:
+                continue
+            if (i + 1) % 5000 == 0 or i == len(same_ch_pairs) - 1:
+                pct = (i + 1) * 100 // max(len(same_ch_pairs), 1)
+                print(f"  FOV overlap: {pct}% ({i + 1}/{len(same_ch_pairs)})", end='\r')
+        print()
+        if fov_matches:
+            print(f"  Found {len(fov_matches)} FOV overlap warnings")
+
+    print(f"\nTotal: {len(unique)} matches, {len(fov_matches)} FOV overlaps")
     _print_summary(unique)
-    return infos, unique
+    return infos, unique, fov_matches
 
 
 def _sev_rank(sev: str) -> int:

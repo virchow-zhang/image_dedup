@@ -32,6 +32,10 @@ class ImageInfo:
     orb_kp: list = None
     orb_des: np.ndarray = None
 
+    sift_kp: list = None
+    sift_des: np.ndarray = None
+    sift_gray: np.ndarray = None
+
 
 def scan_images(directory: str, extensions: set = None) -> list[str]:
     if extensions is None:
@@ -135,6 +139,17 @@ def load_image_info(filepath: str, base_dir: str,
             except Exception:
                 pass
 
+        sift_kp = None
+        sift_des = None
+        sift_gray = None
+        try:
+            import cv2
+            sift = cv2.SIFT_create(nfeatures=0, contrastThreshold=0.04)
+            sift_kp, sift_des = sift.detectAndCompute(gray_256, None)
+            sift_gray = gray_256
+        except Exception:
+            pass
+
         return ImageInfo(
             path=filepath,
             rel_path=rel_path,
@@ -151,6 +166,9 @@ def load_image_info(filepath: str, base_dir: str,
             canny_256=canny_256,
             orb_kp=orb_kp,
             orb_des=orb_des,
+            sift_kp=sift_kp,
+            sift_des=sift_des,
+            sift_gray=sift_gray,
         )
     except Exception as e:
         print(f"  [WARN] Cannot load: {filepath} - {e}")

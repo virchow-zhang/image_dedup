@@ -30,6 +30,14 @@ detection:
   edge_threshold: 0.55
   subimage_threshold: 0.85
   max_workers: 0
+  fov_overlap:
+    enabled: true
+    min_inliers: 8
+    dbscan_eps: 30
+    dbscan_min_samples: 3
+    edge_margin: 60
+    cluster_min_diameter: 15
+    displacement_var_threshold: 15
 
 report:
   output_dir: "dedup_report"

@@ -282,6 +282,59 @@ def _draw_footer(canvas, match: MatchResult, y_base, total_w, font):
     cv2.putText(canvas, label, (lx, y + 14 + th), font, 0.55, WHITE, 1)
 
 
+def annotate_fov_overlap(fov_match, output_path: str, thumb_height: int = 500) -> str:
+    img_a = _imread_unicode(fov_match.image1)
+    img_b = _imread_unicode(fov_match.image2)
+    if img_a is None or img_b is None:
+        return ""
+
+    h1, w1 = img_a.shape[:2]
+    h2, w2 = img_b.shape[:2]
+    s1 = thumb_height / h1
+    s2 = thumb_height / h2
+    disp1 = cv2.resize(img_a, (int(w1 * s1), thumb_height))
+    disp2 = cv2.resize(img_b, (int(w2 * s2), thumb_height))
+
+    for i, (cx, cy, diam) in enumerate(fov_match.clusters_a):
+        x, y, d = int(cx * s1), int(cy * s1), int(diam * s1)
+        cv2.circle(disp1, (x, y), max(d // 2, 5), (0, 255, 255), 2)
+        cv2.putText(disp1, f"#{i + 1}", (x + max(d // 2, 5) + 3, y + 4),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0, (0, 255, 255), 1)
+
+    for i, (cx, cy, diam) in enumerate(fov_match.clusters_b):
+        x, y, d = int(cx * s2), int(cy * s2), int(diam * s2)
+        cv2.circle(disp2, (x, y), max(d // 2, 5), (0, 255, 255), 2)
+        cv2.putText(disp2, f"#{i + 1}", (x + max(d // 2, 5) + 3, y + 4),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0, (0, 255, 255), 1)
+
+        if i < len(fov_match.clusters_a):
+            cx1, cy1 = fov_match.clusters_a[i][:2]
+            x1, y1 = int(cx1 * s1), int(cy1 * s1)
+            cv2.line(disp1, (x1, y1), (x + w1, y), (0, 255, 255), 1, cv2.LINE_AA)
+
+    header_h, gap, footer_h = 90, 12, 80
+    total_w = disp1.shape[1] + gap + disp2.shape[1]
+    total_h = header_h + thumb_height + footer_h
+    canvas = np.zeros((total_h, total_w, 3), dtype=np.uint8)
+    canvas[:] = DARK_BG
+    canvas[header_h:header_h + thumb_height, :disp1.shape[1]] = disp1
+    canvas[header_h:header_h + thumb_height, disp1.shape[1] + gap:] = disp2
+
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    fn1, fn2 = os.path.basename(fov_match.image1), os.path.basename(fov_match.image2)
+    cv2.putText(canvas, fn1, (10, 25), font, 0.65, CYAN, 2)
+    cv2.putText(canvas, fn2, (disp1.shape[1] + gap + 10, 25), font, 0.65, CYAN, 2)
+    cv2.line(canvas, (0, header_h - 2), (total_w, header_h - 2), (80, 80, 80), 1)
+    cv2.line(canvas, (0, header_h + thumb_height), (total_w, header_h + thumb_height), (80, 80, 80), 1)
+    yb = header_h + thumb_height + 5
+    cv2.putText(canvas, fov_match.details, (10, yb + 25), font, 0.55, YELLOW, 1)
+    cv2.putText(canvas, f"簇: {fov_match.cluster_count}", (10, yb + 50), font, 0.5, GRAY, 1)
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    _imwrite_unicode(output_path, canvas)
+    return output_path
+
+
 def _fallback_pil(match: MatchResult, output_path: str, thumb_height: int) -> str:
     try:
         img1 = Image.open(match.image1).convert('RGB')

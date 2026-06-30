@@ -143,13 +143,18 @@ def main():
     with open(os.path.join(output_dir, "config.yaml"), 'w', encoding='utf-8') as f:
         yaml.dump(cfg, f, allow_unicode=True)
 
-    infos, matches = run_detection(scan_dir, cfg)
+    result = run_detection(scan_dir, cfg)
+    if len(result) == 3:
+        infos, matches, fov_matches = result
+    else:
+        infos, matches = result
+        fov_matches = []
 
     if not infos:
-        print("[WARN] No images found. Check directory and file extensions.")
+        print("[WARN] No images found. Check file extensions.")
         return
 
-    if not matches:
+    if not matches and not fov_matches:
         print("No suspicious duplicates found.")
         index_path = os.path.join(output_dir, "report", "index.html")
         os.makedirs(os.path.dirname(index_path), exist_ok=True)
@@ -157,7 +162,7 @@ def main():
         html = _build_html([], scan_dir, len(infos),
                            len(infos) * (len(infos) - 1) // 2,
                            {"critical": 0, "high": 0, "medium": 0},
-                           {}, cfg)
+                           {}, cfg, fov_matches=[])
         with open(index_path, 'w', encoding='utf-8') as f:
             f.write(html)
         print(f"Report: {index_path}")
@@ -167,7 +172,9 @@ def main():
 
     print(f"Rendering all {max_vis} visualization images...")
     vis_dir = os.path.join(output_dir, "report", "vis")
+    fov_vis_dir = os.path.join(output_dir, "report", "vis_fov")
     os.makedirs(vis_dir, exist_ok=True)
+    os.makedirs(fov_vis_dir, exist_ok=True)
 
     for i in range(max_vis):
         m = matches[i]
@@ -182,9 +189,21 @@ def main():
             print(f"  Vis progress: {i + 1}/{max_vis}", end='\r')
 
     print()
+    from viz.annotator import annotate_fov_overlap
+    for i, fm in enumerate(fov_matches):
+        vis_fn = f"fov_{i + 1:04d}_{os.path.basename(fm.image1)[:20]}_vs_{os.path.basename(fm.image2)[:20]}.jpg"
+        vis_path = os.path.join(fov_vis_dir, vis_fn)
+        try:
+            annotate_fov_overlap(fm, vis_path, cfg["report"].get("thumbnail_height", 500))
+        except Exception:
+            pass
+    if fov_matches:
+        print(f"  FOV vis: {len(fov_matches)} images")
+
     print("Generating report...")
     index_path, csv_path = generate_report(
-        matches, infos, output_dir, scan_dir, cfg, vis_dir="vis"
+        matches, infos, output_dir, scan_dir, cfg, vis_dir="vis",
+        fov_matches=fov_matches
     )
     print(f"Report: {index_path}")
     print(f"CSV:    {csv_path}")
