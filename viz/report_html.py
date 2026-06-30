@@ -10,9 +10,7 @@ from core.loader import ImageInfo
 
 def generate_report(matches: list[MatchResult], all_infos: list[ImageInfo],
                     output_dir: str, scan_directory: str, config: dict,
-                    vis_dir: str = "vis", fov_matches: list = None):
-    if fov_matches is None:
-        fov_matches = []
+                    vis_dir: str = "vis"):
     report_dir = os.path.join(output_dir, "report")
     vis_abs = os.path.join(report_dir, vis_dir)
     os.makedirs(vis_abs, exist_ok=True)
@@ -32,7 +30,7 @@ def generate_report(matches: list[MatchResult], all_infos: list[ImageInfo],
         rows.append((m, vis_rel, vis_abs, vis_filename))
 
     html_content = _build_html(rows, scan_directory, total_images, total_pairs,
-                               sev_counts, type_counts, config, fov_matches=fov_matches)
+                               sev_counts, type_counts, config)
     csv_path = os.path.join(report_dir, "comparisons.csv")
     _write_csv(rows, csv_path)
 
@@ -44,12 +42,9 @@ def generate_report(matches: list[MatchResult], all_infos: list[ImageInfo],
 
 
 def _build_html(rows, scan_dir, total_images, total_pairs,
-                sev_counts, type_counts, config, fov_matches=None) -> str:
-    if fov_matches is None:
-        fov_matches = []
+                sev_counts, type_counts, config) -> str:
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     total_matches = len(rows)
-    total_fov = len(fov_matches)
     scan_dir_esc = html.escape(scan_dir)
 
     sev_bars = ""
@@ -74,42 +69,6 @@ def _build_html(rows, scan_dir, total_images, total_pairs,
     for i, (m, vis_rel, vis_abs, vis_fn) in enumerate(rows):
         card_html += _build_card(m, vis_rel, i)
 
-    fov_card_html = ""
-    for i, fm in enumerate(fov_matches):
-        fov_fn = f"fov_{i + 1:04d}_{os.path.basename(fm.image1)[:20]}_vs_{os.path.basename(fm.image2)[:20]}.jpg"
-        fov_rel = f"vis_fov/{fov_fn}"
-        fn1 = html.escape(os.path.basename(fm.image1))
-        fn2 = html.escape(os.path.basename(fm.image2))
-        d1 = html.escape(os.path.dirname(fm.image1))
-        d2 = html.escape(os.path.dirname(fm.image2))
-        details = html.escape(fm.details)
-        sev_label = {"high": "高", "medium": "中"}.get(fm.severity, "中")
-        badge_cls = "badge-high" if fm.severity == "high" else "badge-medium"
-        fov_card_html += f"""<div class="card" data-severity="{fm.severity}">
-  <div class="card-header">
-    <span class="badge {badge_cls}">FOV {sev_label}</span>
-    <span class="fnames">{fn1}  vs  {fn2}</span>
-    <span class="sim">{fm.cluster_count}个细胞簇</span>
-    <span class="type-tag-sm">视野重叠</span>
-    <span class="expand-icon">▼</span>
-  </div>
-  <div class="card-body">
-    <img class="comp-img" src="{fov_rel}" alt="FOV overlap" loading="lazy">
-    <div class="details">
-      <span class="key">类型</span><span class="val">视野重叠（FOV）</span>
-      <span class="key">细胞簇</span><span class="val">{fm.cluster_count} 个</span>
-      <span class="key">重叠方向</span><span class="val">{fm.overlap_direction}</span>
-      <span class="key">估计平移</span><span class="val">dx={fm.estimated_dx:.0f}px, dy={fm.estimated_dy:.0f}px</span>
-      <span class="key">路径 A</span><span class="val">{d1}</span>
-      <span class="key">路径 B</span><span class="val">{d2}</span>
-      <span class="key">详细</span><span class="val">{details}</span>
-    </div>
-  </div>
-</div>"""
-
-    tab_fov_count = f" ({total_fov})" if total_fov > 0 else ""
-    tab_dup_count = f" ({total_matches})" if total_matches > 0 else ""
-
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -123,13 +82,6 @@ body {{ font-family: -apple-system, 'Segoe UI', sans-serif; background: #f5f6fa;
 .header {{ background: linear-gradient(135deg, #2c3e50, #34495e); color: white; padding: 28px 32px; border-radius: 12px; margin-bottom: 20px; }}
 .header h1 {{ font-size: 24px; margin-bottom: 6px; }}
 .header .meta {{ font-size: 13px; opacity: 0.8; line-height: 1.8; }}
-.tabs {{ display: flex; gap: 0; margin-bottom: 16px; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }}
-.tab-btn {{ flex: 1; padding: 12px 20px; border: none; background: transparent; font-size: 14px; cursor: pointer; font-weight: 500; color: #888; transition: 0.15s; }}
-.tab-btn:hover {{ background: #f0f0f0; }}
-.tab-btn.active {{ background: #3498db; color: white; }}
-.tab-btn.active-fov {{ background: #e67e22; color: white; }}
-.tab-content {{ display: none; }}
-.tab-content.active {{ display: block; }}
 .stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }}
 .stat-card {{ background: white; padding: 18px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); text-align: center; }}
 .stat-card .num {{ font-size: 28px; font-weight: 700; }}
@@ -174,7 +126,7 @@ body {{ font-family: -apple-system, 'Segoe UI', sans-serif; background: #f5f6fa;
 .lightbox .close {{ position: absolute; top: 20px; right: 30px; color: white; font-size: 36px; cursor: pointer; }}
 .expand-icon {{ margin-left: auto; font-size: 14px; color: #bbb; }}
 .cross-badge {{ background: #fff3cd; color: #856404; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px; }}
-.fov-badge {{ background: #e67e22; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px; }}
+.geo-badge {{ background: #e8f0fe; color: #1a73e8; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; }}
 @media(max-width:768px) {{ .header h1 {{ font-size: 18px; }} .stat-card .num {{ font-size: 22px; }} }}
 </style>
 </head>
@@ -185,53 +137,35 @@ body {{ font-family: -apple-system, 'Segoe UI', sans-serif; background: #f5f6fa;
   <h1>🔬 科研图片查重报告</h1>
   <div class="meta">
     扫描目录: <code>{scan_dir_esc}</code><br>
-    图片: {total_images} 张 &nbsp;|&nbsp; 比对: {total_pairs:,} 对 &nbsp;|&nbsp; 涉嫌重复: {total_matches} 对 &nbsp;|&nbsp; 视野重叠: {total_fov} 组<br>
+    图片: {total_images} 张 &nbsp;|&nbsp; 比对: {total_pairs:,} 对 &nbsp;|&nbsp; 疑似重复: {total_matches} 对<br>
     生成时间: {ts}
   </div>
 </div>
 
-<div class="tabs">
-  <button class="tab-btn active" data-tab="dup" onclick="switchTab('dup')">🔍 重复检测{tab_dup_count}</button>
-  <button class="tab-btn {'active-fov' if total_fov > 0 and total_matches == 0 else ''}" data-tab="fov" onclick="switchTab('fov')">⚠ 视野重叠警告{tab_fov_count}</button>
+<div class="stats">
+  <div class="stat-card"><div class="num">{total_images}</div><div class="lab">总图片数</div></div>
+  <div class="stat-card"><div class="num">{total_pairs:,}</div><div class="lab">总比对对数</div></div>
+  <div class="stat-card critical"><div class="num">{sev_counts.get("critical", 0)}</div><div class="lab">严重</div></div>
+  <div class="stat-card high"><div class="num">{sev_counts.get("high", 0)}</div><div class="lab">高</div></div>
+  <div class="stat-card medium"><div class="num">{sev_counts.get("medium", 0)}</div><div class="lab">中</div></div>
 </div>
 
-<div id="tab-dup" class="tab-content active">
-  <div class="stats">
-    <div class="stat-card"><div class="num">{total_images}</div><div class="lab">总图片数</div></div>
-    <div class="stat-card"><div class="num">{total_pairs:,}</div><div class="lab">总比对对数</div></div>
-    <div class="stat-card critical"><div class="num">{sev_counts.get("critical", 0)}</div><div class="lab">严重 (Critical)</div></div>
-    <div class="stat-card high"><div class="num">{sev_counts.get("high", 0)}</div><div class="lab">高 (High)</div></div>
-    <div class="stat-card medium"><div class="num">{sev_counts.get("medium", 0)}</div><div class="lab">中 (Medium)</div></div>
-  </div>
-
-  <div class="sev-summary">
-    <div style="font-weight:600;margin-bottom:6px;">严重程度分布</div>
-    {sev_bars}
-    <div class="type-tags">{type_items}</div>
-  </div>
-
-  <div class="filters">
-    <button class="filter-btn active" data-filter="all">全部 ({total_matches})</button>
-    <button class="filter-btn critical active" data-filter="critical">严重 ({sev_counts.get("critical",0)})</button>
-    <button class="filter-btn high active" data-filter="high">高 ({sev_counts.get("high",0)})</button>
-    <button class="filter-btn medium active" data-filter="medium">中 ({sev_counts.get("medium",0)})</button>
-    <label class="cross-toggle"><input type="checkbox" id="crossToggle" checked> 显示跨通道比对</label>
-  </div>
-
-  <div id="cardList">
-  {card_html}
-  </div>
+<div class="sev-summary">
+  <div style="font-weight:600;margin-bottom:6px;">检测类型分布</div>
+  {sev_bars}
+  <div class="type-tags">{type_items}</div>
 </div>
 
-<div id="tab-fov" class="tab-content">
-  <div style="background:#fef9e7;border:1px solid #f5cba7;border-radius:10px;padding:18px;margin-bottom:16px;">
-    <strong>⚠ 视野重叠警告</strong>
-    <div style="font-size:13px;color:#666;margin-top:6px;">
-      以下图片对被检测出存在相同细胞出现在两张图的边缘位置，可能是在拍摄时载物台移动幅度不够大导致相邻视野误重叠。
-      黄色圆圈标注了重复出现的细胞簇，黄色连线连接了同一簇在两图中的对应位置。
-    </div>
-  </div>
-  {fov_card_html if fov_card_html else '<div style="text-align:center;padding:40px;color:#999;">未检测到视野重叠</div>'}
+<div class="filters">
+  <button class="filter-btn active" data-filter="all">全部 ({total_matches})</button>
+  <button class="filter-btn critical active" data-filter="critical">严重 ({sev_counts.get("critical",0)})</button>
+  <button class="filter-btn high active" data-filter="high">高 ({sev_counts.get("high",0)})</button>
+  <button class="filter-btn medium active" data-filter="medium">中 ({sev_counts.get("medium",0)})</button>
+  <label class="cross-toggle"><input type="checkbox" id="crossToggle" checked> 显示跨通道比对</label>
+</div>
+
+<div id="cardList">
+{card_html}
 </div>
 
 </div>
@@ -242,12 +176,6 @@ body {{ font-family: -apple-system, 'Segoe UI', sans-serif; background: #f5f6fa;
 </div>
 
 <script>
-function switchTab(name) {{
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'active-fov'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  document.querySelector('.tab-btn[data-tab="'+name+'"]').classList.add(name === 'fov' ? 'active-fov' : 'active');
-  document.getElementById('tab-'+name).classList.add('active');
-}}
 document.querySelectorAll('.filter-btn').forEach(btn => {{
   btn.onclick = () => {{
     btn.classList.toggle('active');
@@ -259,7 +187,7 @@ function applyFilters() {{
   const showSev = new Set();
   document.querySelectorAll('.filter-btn.active').forEach(b => showSev.add(b.dataset.filter));
   const showCross = document.getElementById('crossToggle').checked;
-  document.querySelectorAll('#tab-dup .card').forEach(c => {{
+  document.querySelectorAll('.card').forEach(c => {{
     const sev = c.dataset.severity;
     const cross = c.dataset.cross === 'true';
     const matchSev = showSev.has('all') || showSev.has(sev);
@@ -296,10 +224,19 @@ def _build_card(m: MatchResult, vis_rel: str, idx: int) -> str:
     mtype = html.escape(m.match_type)
     mdetails = html.escape(m.details)
 
+    geo_tags = ""
+    if m.transform_type:
+        if "旋转" in m.transform_type and abs(m.rotation_deg) > 5:
+            geo_tags += f'<span class="geo-badge">{m.rotation_deg:.0f}°</span>'
+        if "缩放" in m.transform_type and abs(m.scale - 1.0) > 0.05:
+            geo_tags += f'<span class="geo-badge">{m.scale:.2f}x</span>'
+    if m.edge_concentration >= 0.7:
+        geo_tags += f'<span class="geo-badge">边缘{m.edge_concentration:.0%}</span>'
+
     return f"""<div class="card" data-severity="{sev}" data-cross="{cross_attr}">
   <div class="card-header">
     <span class="badge {badge_cls}">{sev_label}</span>
-    <span class="fnames">{fn1}  vs  {fn2}{cross_tag}</span>
+    <span class="fnames">{fn1}  vs  {fn2}{cross_tag}{geo_tags}</span>
     <span class="sim">{m.similarity * 100:.1f}%</span>
     <span class="type-tag-sm">{mtype}</span>
     <span class="expand-icon">▼</span>
@@ -309,6 +246,7 @@ def _build_card(m: MatchResult, vis_rel: str, idx: int) -> str:
     <div class="details">
       <span class="key">匹配类型</span><span class="val">{mtype}</span>
       <span class="key">相似度</span><span class="val">{m.similarity * 100:.2f}%</span>
+      <span class="key">内点数</span><span class="val">{m.inlier_count}</span>
       <span class="key">路径 A</span><span class="val">{dir1}</span>
       <span class="key">路径 B</span><span class="val">{dir2}</span>
       <span class="key">文件名 A</span><span class="val">{fn1}</span>

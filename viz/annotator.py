@@ -70,11 +70,16 @@ def annotate_pair(match: MatchResult, output_path: str, thumb_height: int = 500)
     return output_path
 
 
+ORANGE = (0, 140, 255)
+
 def _draw_feature_matches(disp1, disp2, match: MatchResult, s1: float, s2: float):
     h1, w1 = disp1.shape[:2]
     h2, w2 = disp2.shape[:2]
     pts1 = np.float32([(int(x * s1), int(y * s1)) for x, y in match.match_points1]).reshape(-1, 1, 2)
     pts2 = np.float32([(int(x * s2), int(y * s2)) for x, y in match.match_points2]).reshape(-1, 1, 2)
+
+    if match.edge_concentration >= 0.7:
+        _draw_edge_strip_highlight(disp1, disp2, pts1, s1, s2)
 
     n = min(len(pts1), len(pts2), 100)
     top_n = min(n, 10)
@@ -103,6 +108,37 @@ def _draw_feature_matches(disp1, disp2, match: MatchResult, s1: float, s2: float
         ys2 = [int(p[0][1]) for p in pts2]
         _draw_bounding_box(disp1, min(xs1), min(ys1), max(xs1) - min(xs1), max(ys1) - min(ys1))
         _draw_bounding_box(disp2, min(xs2), min(ys2), max(xs2) - min(xs2), max(ys2) - min(ys2))
+
+
+def _draw_edge_strip_highlight(disp1, disp2, pts1, s1, s2):
+    h = min(disp1.shape[0], disp2.shape[0])
+    w1, w2 = disp1.shape[1], disp2.shape[1]
+    xs = pts1[:, 0, 0]
+    ys = pts1[:, 0, 1]
+    margin = 60
+    img_sz = 256
+    strip_w = min(30, w1 // 6, w2 // 6)
+
+    if (xs < margin).sum() > len(xs) * 0.3:
+        ov1 = disp1.copy()
+        cv2.rectangle(ov1, (0, 0), (strip_w - 1, h - 1), ORANGE, -1)
+        cv2.addWeighted(ov1, 0.3, disp1, 0.7, 0, disp1)
+        cv2.rectangle(disp1, (0, 0), (strip_w - 1, h - 1), ORANGE, 2)
+    elif (xs > img_sz - margin).sum() > len(xs) * 0.3:
+        ov1 = disp1.copy()
+        cv2.rectangle(ov1, (w1 - strip_w, 0), (w1 - 1, h - 1), ORANGE, -1)
+        cv2.addWeighted(ov1, 0.3, disp1, 0.7, 0, disp1)
+        cv2.rectangle(disp1, (w1 - strip_w, 0), (w1 - 1, h - 1), ORANGE, 2)
+    if (ys < margin).sum() > len(ys) * 0.3:
+        ov1 = disp1.copy()
+        cv2.rectangle(ov1, (0, 0), (w1 - 1, strip_w - 1), ORANGE, -1)
+        cv2.addWeighted(ov1, 0.3, disp1, 0.7, 0, disp1)
+        cv2.rectangle(disp1, (0, 0), (w1 - 1, strip_w - 1), ORANGE, 2)
+    elif (ys > img_sz - margin).sum() > len(ys) * 0.3:
+        ov1 = disp1.copy()
+        cv2.rectangle(ov1, (0, h - strip_w), (w1 - 1, h - 1), ORANGE, -1)
+        cv2.addWeighted(ov1, 0.3, disp1, 0.7, 0, disp1)
+        cv2.rectangle(disp1, (0, h - strip_w), (w1 - 1, h - 1), ORANGE, 2)
 
 
 def _draw_bounding_box(img, x, y, w, h):
@@ -269,8 +305,20 @@ def _draw_footer(canvas, match: MatchResult, y_base, total_w, font):
     sim_color = RED if match.severity == "critical" else (0, 140, 255) if match.severity == "high" else YELLOW
     cv2.putText(canvas, sim_text, (10, y + 25), font, 0.7, sim_color, 2)
 
-    cv2.putText(canvas, f"Type: {match.match_type}", (10, y + 50), font, 0.5, GRAY, 1)
-    cv2.putText(canvas, match.details[:60], (10, y + 70), font, 0.4, GRAY, 1)
+    type_text = f"Type: {match.match_type}"
+    if match.transform_type and match.transform_type != "平移":
+        if abs(match.rotation_deg) > 5:
+            type_text += f" | {match.rotation_deg:.0f}°"
+        if abs(match.scale - 1.0) > 0.05:
+            type_text += f" | {match.scale:.2f}x"
+    if match.edge_concentration >= 0.7:
+        type_text += " | 边缘集中"
+    cv2.putText(canvas, type_text, (10, y + 50), font, 0.5, GRAY, 1)
+
+    detail_line = match.details[:60]
+    if match.inlier_count > 0:
+        detail_line += f" [{match.inlier_count} inliers]"
+    cv2.putText(canvas, detail_line, (10, y + 70), font, 0.4, GRAY, 1)
 
     sev_labels = {"critical": "CRITICAL", "high": "HIGH", "medium": "MEDIUM", "low": "LOW"}
     sev_colors = {"critical": (0, 0, 200), "high": (0, 100, 200), "medium": (0, 180, 180), "low": (0, 150, 0)}
@@ -280,59 +328,6 @@ def _draw_footer(canvas, match: MatchResult, y_base, total_w, font):
     lx = total_w - tw - 20
     cv2.rectangle(canvas, (lx - 5, y + 10), (lx + tw + 10, y + 16 + th), color, -1)
     cv2.putText(canvas, label, (lx, y + 14 + th), font, 0.55, WHITE, 1)
-
-
-def annotate_fov_overlap(fov_match, output_path: str, thumb_height: int = 500) -> str:
-    img_a = _imread_unicode(fov_match.image1)
-    img_b = _imread_unicode(fov_match.image2)
-    if img_a is None or img_b is None:
-        return ""
-
-    h1, w1 = img_a.shape[:2]
-    h2, w2 = img_b.shape[:2]
-    s1 = thumb_height / h1
-    s2 = thumb_height / h2
-    disp1 = cv2.resize(img_a, (int(w1 * s1), thumb_height))
-    disp2 = cv2.resize(img_b, (int(w2 * s2), thumb_height))
-
-    for i, (cx, cy, diam) in enumerate(fov_match.clusters_a):
-        x, y, d = int(cx * s1), int(cy * s1), int(diam * s1)
-        cv2.circle(disp1, (x, y), max(d // 2, 5), (0, 255, 255), 2)
-        cv2.putText(disp1, f"#{i + 1}", (x + max(d // 2, 5) + 3, y + 4),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0, (0, 255, 255), 1)
-
-    for i, (cx, cy, diam) in enumerate(fov_match.clusters_b):
-        x, y, d = int(cx * s2), int(cy * s2), int(diam * s2)
-        cv2.circle(disp2, (x, y), max(d // 2, 5), (0, 255, 255), 2)
-        cv2.putText(disp2, f"#{i + 1}", (x + max(d // 2, 5) + 3, y + 4),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0, (0, 255, 255), 1)
-
-        if i < len(fov_match.clusters_a):
-            cx1, cy1 = fov_match.clusters_a[i][:2]
-            x1, y1 = int(cx1 * s1), int(cy1 * s1)
-            cv2.line(disp1, (x1, y1), (x + w1, y), (0, 255, 255), 1, cv2.LINE_AA)
-
-    header_h, gap, footer_h = 90, 12, 80
-    total_w = disp1.shape[1] + gap + disp2.shape[1]
-    total_h = header_h + thumb_height + footer_h
-    canvas = np.zeros((total_h, total_w, 3), dtype=np.uint8)
-    canvas[:] = DARK_BG
-    canvas[header_h:header_h + thumb_height, :disp1.shape[1]] = disp1
-    canvas[header_h:header_h + thumb_height, disp1.shape[1] + gap:] = disp2
-
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    fn1, fn2 = os.path.basename(fov_match.image1), os.path.basename(fov_match.image2)
-    cv2.putText(canvas, fn1, (10, 25), font, 0.65, CYAN, 2)
-    cv2.putText(canvas, fn2, (disp1.shape[1] + gap + 10, 25), font, 0.65, CYAN, 2)
-    cv2.line(canvas, (0, header_h - 2), (total_w, header_h - 2), (80, 80, 80), 1)
-    cv2.line(canvas, (0, header_h + thumb_height), (total_w, header_h + thumb_height), (80, 80, 80), 1)
-    yb = header_h + thumb_height + 5
-    cv2.putText(canvas, fov_match.details, (10, yb + 25), font, 0.55, YELLOW, 1)
-    cv2.putText(canvas, f"簇: {fov_match.cluster_count}", (10, yb + 50), font, 0.5, GRAY, 1)
-
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    _imwrite_unicode(output_path, canvas)
-    return output_path
 
 
 def _fallback_pil(match: MatchResult, output_path: str, thumb_height: int) -> str:

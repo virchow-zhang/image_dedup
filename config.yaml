@@ -24,20 +24,11 @@ detection:
   ssim_threshold: 0.98
   hist_threshold: 0.9999
   hist_enabled: false
-  orb_enabled: true
-  orb_min_matches: 10
-  orb_max_features: 2000
+  sift_enabled: true
+  sift_min_inliers: 10
   edge_threshold: 0.55
   subimage_threshold: 0.85
   max_workers: 0
-  fov_overlap:
-    enabled: true
-    min_inliers: 8
-    dbscan_eps: 30
-    dbscan_min_samples: 3
-    edge_margin: 60
-    cluster_min_diameter: 15
-    displacement_var_threshold: 15
 
 report:
   output_dir: "dedup_report"

@@ -34,7 +34,6 @@ class ImageInfo:
 
     sift_kp: list = None
     sift_des: np.ndarray = None
-    sift_gray: np.ndarray = None
 
 
 def scan_images(directory: str, extensions: set = None) -> list[str]:
@@ -102,17 +101,8 @@ def _compute_histogram(rgb_256: np.ndarray) -> np.ndarray:
     return hist
 
 
-def _compute_orb(gray_256: np.ndarray, max_features: int = 2000):
-    import cv2
-    orb = cv2.ORB_create(nfeatures=max_features)
-    kp, des = orb.detectAndCompute(gray_256, None)
-    return kp, des
-
-
 def load_image_info(filepath: str, base_dir: str,
-                    hash_size: int = 16,
-                    compute_orb: bool = True,
-                    orb_max_features: int = 2000) -> Optional[ImageInfo]:
+                    hash_size: int = 16) -> Optional[ImageInfo]:
     try:
         rel_path = os.path.relpath(filepath, base_dir)
         file_size = os.path.getsize(filepath)
@@ -131,22 +121,11 @@ def load_image_info(filepath: str, base_dir: str,
         import cv2
         canny_256 = cv2.Canny(gray_256, 30, 100)
 
-        orb_kp = None
-        orb_des = None
-        if compute_orb:
-            try:
-                orb_kp, orb_des = _compute_orb(gray_256, orb_max_features)
-            except Exception:
-                pass
-
         sift_kp = None
         sift_des = None
-        sift_gray = None
         try:
-            import cv2
             sift = cv2.SIFT_create(nfeatures=0, contrastThreshold=0.04)
             sift_kp, sift_des = sift.detectAndCompute(gray_256, None)
-            sift_gray = gray_256
         except Exception:
             pass
 
@@ -164,11 +143,8 @@ def load_image_info(filepath: str, base_dir: str,
             ahash=ahash,
             hist=hist,
             canny_256=canny_256,
-            orb_kp=orb_kp,
-            orb_des=orb_des,
             sift_kp=sift_kp,
             sift_des=sift_des,
-            sift_gray=sift_gray,
         )
     except Exception as e:
         print(f"  [WARN] Cannot load: {filepath} - {e}")
