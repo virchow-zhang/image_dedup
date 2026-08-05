@@ -45,18 +45,30 @@ def resolve_config(config_path: str, cli_args: dict) -> dict:
         cfg["scan"]["directory"] = cli_args["directory"]
 
     if cli_args.get("quick"):
-        cfg["detection"]["orb_enabled"] = False
-        cfg["detection"]["subimage_threshold"] = 0.99
-        cfg["detection"]["edge_threshold"] = 0.99
+        cfg["detection"]["rotation_enabled"] = False
+        cfg["detection"]["subimage_enabled"] = False
+        cfg["detection"]["cmfd_enabled"] = False
+        cfg["ai"]["enabled"] = False
+        cfg["index"]["rotation_variants"] = False
 
     if cli_args.get("strict"):
         cfg["detection"]["phash_threshold"] = 3
         cfg["detection"]["ssim_threshold"] = 0.90
         cfg["detection"]["hist_threshold"] = 0.85
-        cfg["detection"]["orb_min_matches"] = 8
+        cfg["detection"]["hist_enabled"] = True
+        cfg["detection"]["sift_min_inliers"] = 8
 
     if cli_args.get("threads"):
-        cfg["detection"]["max_workers"] = cli_args["threads"]
+        cfg["scan"]["max_workers"] = cli_args["threads"]
+
+    if cli_args.get("ai"):
+        cfg["ai"]["enabled"] = True
+
+    if cli_args.get("no_ai"):
+        cfg["ai"]["enabled"] = False
+
+    if cli_args.get("no_cmfd"):
+        cfg["detection"]["cmfd_enabled"] = False
 
     if cli_args.get("threshold") is not None:
         cfg["detection"]["phash_threshold"] = cli_args["threshold"]
@@ -65,13 +77,14 @@ def resolve_config(config_path: str, cli_args: dict) -> dict:
         cfg["detection"]["ssim_threshold"] = cli_args["ssim"]
 
     if cli_args.get("no_orb"):
-        cfg["detection"]["orb_enabled"] = False
+        cfg["detection"]["sift_enabled"] = False
 
     if cli_args.get("no_rotation"):
-        pass
+        cfg["detection"]["rotation_enabled"] = False
+        cfg["index"]["rotation_variants"] = False
 
     if cli_args.get("no_subimage"):
-        cfg["detection"]["subimage_threshold"] = 1.1
+        cfg["detection"]["subimage_enabled"] = False
 
     if cli_args.get("no_edge"):
         cfg["detection"]["edge_threshold"] = 1.1
@@ -98,17 +111,20 @@ def main():
     parser.add_argument("-d", "--directory", help="待扫描的顶层目录")
     parser.add_argument("-c", "--config", default=DEFAULT_CONFIG_PATH, help="配置文件路径")
     parser.add_argument("-o", "--output", help="报告输出目录")
-    parser.add_argument("--quick", action="store_true", help="快速模式（跳过ORB/子图/边缘检测）")
+    parser.add_argument("--quick", action="store_true", help="快速模式（跳过旋转/子图/CMFD/AI检测）")
     parser.add_argument("--strict", action="store_true", help="严格模式（降低所有阈值）")
-    parser.add_argument("--no-orb", action="store_true", help="跳过ORB特征匹配")
+    parser.add_argument("--ai", action="store_true", help="启用AI嵌入检测层（自动下载模型）")
+    parser.add_argument("--no-ai", action="store_true", help="禁用AI嵌入检测层")
+    parser.add_argument("--no-cmfd", action="store_true", help="跳过内部区域复制检测")
+    parser.add_argument("--no-orb", action="store_true", help="跳过SIFT特征匹配验证")
     parser.add_argument("--no-rotation", action="store_true", help="跳过旋转/翻转检测")
     parser.add_argument("--no-subimage", action="store_true", help="跳过于图/裁剪检测")
     parser.add_argument("--no-edge", action="store_true", help="跳过边缘重叠检测")
-    parser.add_argument("--threads", type=int, help="并行线程数")
+    parser.add_argument("--threads", type=int, help="并行加载线程数")
     parser.add_argument("--threshold", type=int, help="pHash阈值覆盖")
     parser.add_argument("--ssim", type=float, help="SSIM阈值覆盖")
     parser.add_argument("-q", "--quiet", action="store_true", help="静默模式")
-    parser.add_argument("--version", action="version", version="image_dedup 2.0")
+    parser.add_argument("--version", action="version", version="image_dedup 3.0")
 
     args = parser.parse_args()
     cli = {k: v for k, v in vars(args).items() if v is not None}

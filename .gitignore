@@ -4,3 +4,23 @@ __pycache__/
 .DS_Store
 test.tif
 _test_*.py
+
+# 构建产物
+cpp/build/
+dist/
+build/
+
+# 原生内核二进制与依赖 DLL (本地构建产物, 用 scripts/build_core.bat 生成)
+dedup_core.exe
+libs/
+
+# 测试数据与输出
+tests/data/
+tests/out_*/
+
+# 报告输出
+dedup_report/
+
+# AI 模型 (自动下载)
+models/*.onnx
+models/*.part

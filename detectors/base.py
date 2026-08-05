@@ -23,6 +23,13 @@ class MatchResult:
     edge_continuity: float = 0.0
     inlier_count: int = 0
 
+    # 内部区域复制: 复制源区域与粘贴区域 (x, y, w, h), 原图像素坐标
+    region1: tuple = None
+    region2: tuple = None
+
+    # 融合后的证据链: [{type, severity, similarity, details}, ...]
+    evidence: list = field(default_factory=list)
+
 
 class BaseDetector:
     name = "base"

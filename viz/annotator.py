@@ -55,7 +55,9 @@ def annotate_pair(match: MatchResult, output_path: str, thumb_height: int = 500)
     has_match_points = (match.match_points1 is not None and len(match.match_points1) > 0
                         and match.match_points2 is not None and len(match.match_points2) > 0)
 
-    if has_match_points:
+    if match.region1 and match.region2 and "内部区域复制" in match.match_type:
+        _draw_cmfd(disp1, disp2, match, scale1, scale2)
+    elif has_match_points:
         _draw_feature_matches(disp1, disp2, match, scale1, scale2)
     elif "子图" in match.match_type or "裁剪" in match.match_type:
         _draw_subimage(gray_a, gray_b, disp1, disp2, match, scale1, scale2)
@@ -71,6 +73,21 @@ def annotate_pair(match: MatchResult, output_path: str, thumb_height: int = 500)
 
 
 ORANGE = (0, 140, 255)
+
+
+def _draw_cmfd(disp1, disp2, match: MatchResult, s1: float, s2: float):
+    """内部区域复制: 源区域红框, 粘贴区域绿框 (两张面板为同一图)。"""
+    x1, y1, w1, h1 = match.region1
+    x2, y2, w2, h2 = match.region2
+    for disp, s in ((disp1, s1), (disp2, s2)):
+        cv2.rectangle(disp, (int(x1 * s), int(y1 * s)),
+                      (int((x1 + w1) * s), int((y1 + h1) * s)), RED, 3)
+        cv2.rectangle(disp, (int(x2 * s), int(y2 * s)),
+                      (int((x2 + w2) * s), int((y2 + h2) * s)), GREEN, 3)
+        cv2.putText(disp, "源", (int(x1 * s) + 4, int(y1 * s) + 20),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, RED, 2)
+        cv2.putText(disp, "复制", (int(x2 * s) + 4, int(y2 * s) + 20),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, GREEN, 2)
 
 def _draw_feature_matches(disp1, disp2, match: MatchResult, s1: float, s2: float):
     h1, w1 = disp1.shape[:2]

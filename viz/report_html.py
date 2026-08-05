@@ -224,6 +224,13 @@ def _build_card(m: MatchResult, vis_rel: str, idx: int) -> str:
     mtype = html.escape(m.match_type)
     mdetails = html.escape(m.details)
 
+    evidence_row = ""
+    if m.evidence:
+        chain = " &nbsp;|&nbsp; ".join(
+            f"{html.escape(e['type'])} ({e['similarity']:.2f})" for e in m.evidence[:6])
+        evidence_row = f"""
+      <span class="key">证据链</span><span class="val">{chain}</span>"""
+
     geo_tags = ""
     if m.transform_type:
         if "旋转" in m.transform_type and abs(m.rotation_deg) > 5:
@@ -251,7 +258,7 @@ def _build_card(m: MatchResult, vis_rel: str, idx: int) -> str:
       <span class="key">路径 B</span><span class="val">{dir2}</span>
       <span class="key">文件名 A</span><span class="val">{fn1}</span>
       <span class="key">文件名 B</span><span class="val">{fn2}</span>
-      <span class="key">详细</span><span class="val">{mdetails}</span>
+      <span class="key">详细</span><span class="val">{mdetails}</span>{evidence_row}
     </div>
   </div>
 </div>"""

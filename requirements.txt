@@ -1,5 +1,14 @@
+# 基础依赖
 Pillow>=10.0.0
 numpy>=1.24.0
 opencv-python>=4.8.0
 imagehash>=4.3.0
 PyYAML>=6.0
+tifffile>=2023.0.0
+
+# AI 嵌入层 (可选, --ai 时使用)
+onnxruntime>=1.16.0
+onnx>=1.15.0
+
+# C++ 原生内核构建 (可选, scripts/build_core.bat)
+#   conda create -y -n dedup_build -c conda-forge opencv cmake ninja

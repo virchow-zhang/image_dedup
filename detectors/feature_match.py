@@ -18,6 +18,11 @@ class FeatureMatchDetector(BaseDetector):
 
         cfg = self.config
         min_inliers = cfg.get("sift_min_inliers", 10)
+        max_dim = cfg.get("sift_max_dim", 1024)
+        nfeatures = cfg.get("sift_nfeatures", 2000)
+
+        info1.ensure_sift(max_dim=max_dim, nfeatures=nfeatures)
+        info2.ensure_sift(max_dim=max_dim, nfeatures=nfeatures)
 
         des1, des2 = info1.sift_des, info2.sift_des
         kp1, kp2 = info1.sift_kp, info2.sift_kp
@@ -59,11 +64,20 @@ class FeatureMatchDetector(BaseDetector):
             in_pts1 = pts1[inlier_mask]
             in_pts2 = pts2[inlier_mask]
 
+            # 覆盖率判据: 内点必须覆盖足够大的区域, 排除
+            # 纹理自相似造成的少量伪内点簇
+            ow, oh = info1.size
+            xs, ys = in_pts1[:, 0], in_pts1[:, 1]
+            bw, bh = xs.max() - xs.min(), ys.max() - ys.min()
+            coverage = (bw * bh) / max(1, ow * oh)
+            edge_conc = _edge_concentration(in_pts1, IMG_SIZE, EDGE_MARGIN)
+            if edge_conc < 0.7 and (coverage < 0.04 or inliers < 12):
+                return None
+
             sim = min(1.0, inliers / max(len(kp1), len(kp2)))
 
             transform_type, angle, scale = _analyze_transform(H)
             dx, dy = _median_translation(in_pts1, in_pts2)
-            edge_conc = _edge_concentration(in_pts1, IMG_SIZE, EDGE_MARGIN)
             edge_cont = _edge_continuity(in_pts1, IMG_SIZE, EDGE_MARGIN, N_BINS)
             disp_var = _displacement_variance(in_pts1, in_pts2)
 

@@ -1,4 +1,4 @@
-scan:
+﻿scan:
   directory: null
   recursive: true
   extensions:
@@ -8,6 +8,7 @@ scan:
     - ".jpeg"
     - ".png"
     - ".bmp"
+  max_workers: 8
 
 grouping:
   patterns:
@@ -18,17 +19,37 @@ grouping:
     phash_boost: 0.6
     ssim_boost: 1.1
 
+index:
+  mih_tables: 16
+  rotation_variants: true
+  candidate_threshold: 15
+  bow_enabled: true
+  bow_min_shared: 6
+
 detection:
-  phash_threshold: 3
+  phash_threshold: 5
   phash_hash_size: 16
+  rotation_enabled: true
   ssim_threshold: 0.98
-  hist_threshold: 0.9999
   hist_enabled: false
+  hist_threshold: 0.9999
   sift_enabled: true
   sift_min_inliers: 10
+  sift_max_dim: 1024
+  sift_nfeatures: 2000
   edge_threshold: 0.55
+  subimage_enabled: true
   subimage_threshold: 0.85
+  cmfd_enabled: true
+  cmfd_min_matches: 6
+  cmfd_max_dim: 2048
   max_workers: 0
+
+ai:
+  enabled: false
+  model_path: "models/mobilenetv2-7.onnx"
+  cosine_threshold: 0.90
+  top_k: 20
 
 report:
   output_dir: "dedup_report"
