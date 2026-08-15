@@ -1449,11 +1449,11 @@ def find_duplicates(images: list[ImageInfo],
                         matches.append(m)
                         exact_pairs.add((group[i].path, group[j].path))
 
-    print(f"  [✓] 阶段1 完全相同: {len(matches)} 对")
+    print(f"  [OK] 阶段1 完全相同: {len(matches)} 对")
 
     # ---- 阶段2: 哈希分桶找候选对 ----
     # 用pHash分桶：将哈希划分为多个子段，只要有一个子段匹配就作为候选
-    print(f"  [·] 阶段2 哈希分桶找候选对...")
+    print(f"  [...] 阶段2 哈希分桶找候选对...")
 
     # 直接用pHash的汉明距离筛选候选
     candidate_pairs = set()
@@ -1517,10 +1517,10 @@ def find_duplicates(images: list[ImageInfo],
            not _is_same_experiment_channel(images[i].path, images[j].path)
     }
 
-    print(f"  [✓] 候选对数量: {len(candidate_pairs)} (vs 全量 {n*(n-1)//2})")
+    print(f"  [OK] 候选对数量: {len(candidate_pairs)} (vs 全量 {n*(n-1)//2})")
 
     # ---- 阶段3: 对候选对做详细检测 ----
-    print(f"  [·] 阶段3 详细检测候选对...")
+    print(f"  [...] 阶段3 详细检测候选对...")
 
     # 用pHash距离做第一轮精确过滤
     final_candidates = []
@@ -1535,7 +1535,7 @@ def find_duplicates(images: list[ImageInfo],
     # 按距离排序，优先处理最相似的
     final_candidates.sort(key=lambda x: x[2])
 
-    print(f"  [✓] 需要详细检测: {len(final_candidates)} 对")
+    print(f"  [OK] 需要详细检测: {len(final_candidates)} 对")
 
     # 预加载所有图片的pHash用于旋转检测
     # （只对距离较近的候选对做旋转检测）
@@ -1611,17 +1611,17 @@ def find_duplicates(images: list[ImageInfo],
             if m:
                 matches.append(m)
 
-    print(f"  [✓] 阶段3 详细检测完成")
+    print(f"  [OK] 阶段3 详细检测完成")
 
     # ---- 阶段4: 内部区域复制检测 ----
     if check_internal:
-        print(f"  [·] 阶段4 检测图片内部区域复制...")
+        print(f"  [...] 阶段4 检测图片内部区域复制...")
         internal_count = 0
         for img in images:
             internal = check_internal_duplicate(img.path)
             matches.extend(internal)
             internal_count += len(internal)
-        print(f"  [✓] 内部复制检测完成: 发现 {internal_count} 处")
+        print(f"  [OK] 内部复制检测完成: 发现 {internal_count} 处")
 
     return matches
 
@@ -1896,7 +1896,7 @@ def main():
         sys.exit(1)
 
     print("=" * 60)
-    print("  🔬 科研图片查重工具")
+    print("  [工具] 科研图片查重工具")
     print("=" * 60)
     print(f"  扫描目录: {args.directory}")
     print(f"  哈希阈值: {args.threshold}")
@@ -1937,30 +1937,30 @@ def main():
             if vis_path:
                 m.details += f" [可视化: {os.path.basename(vis_path)}]"
                 vis_count += 1
-        print(f"  [✓] 生成 {vis_count} 张可视化对比图: {vis_dir}")
+        print(f"  [OK] 生成 {vis_count} 张可视化对比图: {vis_dir}")
 
     # 输出结果
     print("\n" + "=" * 60)
-    print(f"  📊 检测结果: 发现 {len(matches)} 对可疑重复")
+    print(f"  [结果] 检测结果: 发现 {len(matches)} 对可疑重复")
     print("=" * 60)
 
     if not matches:
-        print("\n  ✅ 未发现可疑重复图片！")
+        print("\n  [无结果] 未发现可疑重复图片！")
     else:
         # 按严重程度分组输出
         by_severity = defaultdict(list)
         for m in matches:
             by_severity[m.severity].append(m)
 
-        severity_icons = {"critical": "🔴", "high": "🟠", "medium": "🟡", "low": "🟢"}
+        severity_icons = {"critical": "[严重]", "high": "[高风险]", "medium": "[中等]", "low": "[低风险]"}
         severity_names = {"critical": "严重", "high": "高风险", "medium": "中等", "low": "低风险"}
 
         for sev in ["critical", "high", "medium", "low"]:
             if sev in by_severity:
                 print(f"\n  {severity_icons[sev]} {severity_names[sev]} ({len(by_severity[sev])} 对):")
                 for m in by_severity[sev][:10]:  # 每类最多显示10条
-                    print(f"    • {m.match_type} (相似度: {m.similarity*100:.1f}%)")
-                    print(f"      {os.path.basename(m.image1)} ↔ {os.path.basename(m.image2)}")
+                    print(f"    - {m.match_type} (相似度: {m.similarity*100:.1f}%)")
+                    print(f"      {os.path.basename(m.image1)} <-> {os.path.basename(m.image2)}")
                     print(f"      {m.details}")
                 if len(by_severity[sev]) > 10:
                     print(f"    ... 还有 {len(by_severity[sev]) - 10} 对")
@@ -1986,7 +1986,7 @@ def main():
     if csv_path != report_path:
         generate_csv_report(matches, csv_path)
 
-    print(f"\n✅ 扫描完成！")
+    print(f"\n[完成] 扫描完成！")
 
 
 if __name__ == "__main__":

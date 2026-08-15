@@ -24,20 +24,58 @@ python build_exe.py
 - 双击直接运行，无需Python环境
 - 分发给其他人使用
 
-### 方法三：命令行运行
+### 方法三：命令行运行（推荐用优化版）
 
 ```bash
 # 扫描当前目录
 python image_dedup.py
 
-# 扫描指定目录
-python image_dedup.py D:\photos
+# 扫描指定目录（优化版，速度更快、误报更低）
+python image_dedup_optimized.py D:\photos
 
 # 调整参数
-python image_dedup.py D:\photos --threshold 3 --workers 8
+python image_dedup_optimized.py D:\photos --min-confidence 0.7 --min-votes 3
 
 # 查看帮助
-python image_dedup.py --help
+python image_dedup_optimized.py --help
+```
+
+## 优化版（image_dedup_optimized.py）
+
+在 `image_dedup.py` 基础上做了三方面增强，**推荐使用**：
+
+### 1. 降低误报率
+- **窗口化 SSIM（内容加权）**：替代全局标量SSIM。科研图大片背景相似但内容不同的两张图，
+  旧算法 SSIM 会虚高到 0.9+（实测0.96），现在按局部方差加权，仅内容区域主导分数
+- **低信息量图过滤**：空白/纯色图（灰度std过低）只走MD5精确匹配，消除
+  "两张任意空白图互报 critical" 的经典误报
+- **投票去相关**：pHash/dHash 同源高度相关、直方图纯统计信号，三者互不独立。
+  现改为 pHash/dHash/SSIM 三个结构类检测器投票（`--min-votes`），直方图降为参考票
+- **亮度归一化SSIM**：专捕"同结构不同曝光"（亮度/对比度/曝光调整）的副本，实测区分度 ~1.0 vs <0
+- **ORB二次确认**：恰好最低票数通过的边缘候选对，用ORB特征匹配独立复核，
+  确认失败默认降级（`--orb-strict` 直接剔除）
+- **旋转检测重写**：原 whash-64bit 对深色稀疏条带图无区分度（真实旋转与随机图对
+  差异区间重叠，误报极高）；改用变换后 phash-256bit 比较（真旋转≤10、随机对≥90，
+  阈值24两侧余量充足），并用**等比缩放画布**修复非方形图旋转比较失真的问题
+
+### 2. 补回漏掉的检测能力
+- **子图/裁剪检测（快速版）**：原版 O(w·h·scale) 滑动窗口慢到不可用被删除；
+  现用"面积比过滤 + 降采样 + 多尺度 matchTemplate"，毫秒级，条带复用类造假可检出
+- **旋转/翻转增强召回**：旋转副本哈希差异巨大、进不了普通索引，旋转检测形同虚设；
+  现为每张图额外索引 5 种几何变换哈希，旋转副本重新可召回
+
+### 3. 交互性能
+- 目录单次遍历（原实现按扩展名重复遍历 32 次）、MD5 分块流式、超大图（SVS/NDPI）
+  draft 无损降采样解码，防内存爆炸
+- 缩略图按图片路径缓存 + 并行生成（原实现每对重复生成、串行）
+- HTML 报告新增：文件名搜索、分页（50/100/200条）、"出现N次"badge（同一张图
+  出现在多对里时提示优先审查）、Esc 关闭全屏
+- 新增 `--min-confidence`（置信度过滤）、`--no-thumbnails`（大报告加速）、
+  JSON 报告输出（`--report x.json`，便于二次处理）
+
+```bash
+python image_dedup_optimized.py D:\photos --no-thumbnails --report result.json
+python image_dedup_optimized.py D:\photos --min-confidence 0.8 --no-rotation
 ```
 
 ## 检测功能
