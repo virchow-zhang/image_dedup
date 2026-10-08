@@ -99,6 +99,8 @@ def main(argv=None):
                     help='图内匹配：归一化互相关验证阈值')
     ap.add_argument('--no-thumbnails', action='store_true',
                     help='报告不内嵌图片（报告很小，但看不到图）')
+    ap.add_argument('--candidate-threshold', type=int, default=0,
+                    help='候选生成 pHash 距离上限（0=自动，放宽可召回任意角度旋转）')
     ap.add_argument('--no-subimage', action='store_true',
                     help='关闭子图/裁剪检测（金字塔模板匹配）')
     ap.add_argument('--subimage-threshold', type=float, default=0.85,
@@ -130,6 +132,7 @@ def main(argv=None):
         cross_matches = find_cross_duplicates(
             recs, phash_threshold=args.hash_threshold,
             min_votes=args.min_votes, verbose=True,
+            candidate_threshold=args.candidate_threshold,
             detect_subimage=not args.no_subimage,
             subimage_threshold=args.subimage_threshold,
             detect_edge=not args.no_edge,

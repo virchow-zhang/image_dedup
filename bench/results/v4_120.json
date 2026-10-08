@@ -1,17 +1,17 @@
 {
  "detector": "v4",
- "label": "v4@120",
+ "label": "v4g_120",
  "data": "D:\\Github\\image_dedup\\bench\\data",
- "wall_s": 4.44,
+ "wall_s": 4.53,
  "timings": {
-  "load_s": 0.32,
-  "detect_s": 0.1,
-  "intra_s": 3.95,
-  "total_s": 4.36
+  "load_s": 0.36,
+  "detect_s": 0.11,
+  "intra_s": 3.98,
+  "total_s": 4.44
  },
  "memory": {
   "rss_start_mb": 48.3,
-  "rss_peak_mb": 80.7
+  "rss_peak_mb": 83.7
  },
  "n_images": 120,
  "error": null,

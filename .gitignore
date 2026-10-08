@@ -41,3 +41,11 @@ bench/results/*
 !bench/results/v3m.json
 !bench/results/v4_120.json
 !bench/results/v4_1200.json
+!bench/results/v3m_onmaster.json
+!bench/results/v4g_onmaster.json
+!bench/results/cmp_onmaster.md
+
+# master 基准（bench/make_master_bench.py 可重新生成）
+bench/data_master/
+bench/data_master_raw/
+

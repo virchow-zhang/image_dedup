@@ -143,7 +143,7 @@ def run_v3(data_dir: Path, workers: int = 8, **kw):
     peak.append(proc.memory_info().rss)
 
     t1 = time.perf_counter()
-    matches = find_cross_duplicates(recs)
+    matches = find_cross_duplicates(recs, candidate_threshold=int(os.environ.get('DEDUP_CAND_TH', '0')))
     t_detect = time.perf_counter() - t1
     peak.append(proc.memory_info().rss)
 
@@ -345,6 +345,11 @@ def score_cross(res, gt, data_dir):
     pred = {frozenset(p) for p in res['cross_pairs']}
     pos_list = gt['cross']['positives']
     pos = {frozenset((p['a'], p['b'])): p for p in pos_list}
+
+    # ignore：语义模糊的对（例如 master 基准里 splice 与其基底其他变换只共享局部），
+    # 既不算正样本也不算误报，否则对任何检测器都不公平
+    ign = {frozenset(p) for p in gt['cross'].get('ignore', [])}
+    pred -= ign
 
     tp = pred & set(pos)
     fp = pred - set(pos)

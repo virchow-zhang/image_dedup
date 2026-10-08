@@ -1,17 +1,17 @@
 {
- "detector": "v3",
- "label": "v4@1200",
+ "detector": "v4",
+ "label": "v4g_1200",
  "data": "D:\\Github\\image_dedup\\bench\\data_scale",
- "wall_s": 5.32,
+ "wall_s": 6.15,
  "timings": {
-  "load_s": 2.7,
-  "detect_s": 2.46,
+  "load_s": 2.97,
+  "detect_s": 3.02,
   "intra_s": 0.0,
-  "total_s": 5.17
+  "total_s": 5.99
  },
  "memory": {
-  "rss_start_mb": 48.6,
-  "rss_peak_mb": 89.0
+  "rss_start_mb": 49.1,
+  "rss_peak_mb": 94.1
  },
  "n_images": 1200,
  "error": null,

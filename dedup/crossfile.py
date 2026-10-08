@@ -25,11 +25,12 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 import cv2
 import numpy as np
 
+from .bow import bow_candidates, compute_bow_keys
 from .edge_overlap import check_edge_overlap
 from .subimage import SubimageCache, check_subimage_arrays, subimage_candidate_pairs
 
@@ -41,8 +42,12 @@ CHANNEL_SUFFIXES = ['_CH1', '_CH2', '_CH3', '_CH4', '_CH5', '_Overlay',
                     '_Bright', '_DIC', '_GFP', '_RFP', '_DAPI', '_Cy3',
                     '_Cy5', '_FITC', '_TRITC']
 
-# 参与索引的几何变换
-GEOMETRY = ('id', 'rot90', 'rot180', 'rot270', 'flipH', 'flipV')
+# 参与索引的几何变换。
+# ±15°/±30° 这四档是关键：只索引 90° 整数倍时，**任意角度旋转**的副本
+# （如 17°）哈希差异巨大、根本进不了候选集，召回直接为 0。
+# 加上粗角度覆盖后，17° 旋转可由 rot345 档补到 2° 残差，落进哈希容差内。
+GEOMETRY = ('id', 'rot90', 'rot180', 'rot270', 'flipH', 'flipV',
+            'rot15', 'rot345', 'rot30', 'rot330')
 
 _POPCOUNT = np.array([bin(i).count('1') for i in range(256)], np.uint8)
 
@@ -61,6 +66,7 @@ class ImageRecord:
     dhash: np.ndarray
     geom_hash: Dict[str, np.ndarray] = field(default_factory=dict)
     sub_hash: Optional[np.ndarray] = None   # (K, words) 若干子窗口的 pHash
+    bow_keys: Optional[Set[int]] = None     # ORB 词袋键
     hist: Optional[np.ndarray] = None
     gray_small: Optional[np.ndarray] = None
 
@@ -164,7 +170,8 @@ def _load_gray(path: str, max_dim: int = 512) -> Optional[np.ndarray]:
     return np.ascontiguousarray(g)
 
 
-def load_record(path: str, hash_size: int = 16) -> Optional[ImageRecord]:
+def load_record(path: str, hash_size: int = 16,
+                compute_bow: bool = False) -> Optional[ImageRecord]:
     gray = _load_gray(path)
     if gray is None or gray.size == 0:
         return None
@@ -184,12 +191,23 @@ def load_record(path: str, hash_size: int = 16) -> Optional[ImageRecord]:
             return np.ascontiguousarray(np.rot90(g, 3))
         if name == 'flipH':
             return np.ascontiguousarray(g[:, ::-1])
-        return np.ascontiguousarray(g[::-1, :])
+        if name == 'flipV':
+            return np.ascontiguousarray(g[::-1, :])
+        if name.startswith('rot'):                     # rot15 / rot345 / rot30 / rot330
+            ang = int(name[3:])
+            h, w = g.shape[:2]
+            M = cv2.getRotationMatrix2D((w / 2, h / 2), ang, 1.0)
+            return cv2.warpAffine(g, M, (w, h), flags=cv2.INTER_LINEAR,
+                                  borderMode=cv2.BORDER_REPLICATE)
+        raise ValueError(name)
 
     ph = _bits_to_u64(_phash_bits(gray, hash_size))
     dh = _bits_to_u64(_dhash_bits(gray, hash_size))
     geom = {t: _bits_to_u64(_phash_bits(_geom(gray, t), hash_size)) for t in GEOMETRY}
     sub = _subwindow_hashes(gray, hash_size)
+    # ORB 词袋键只在启用该层时才算：每图上千个 int 装进 set，
+    # 1200 张会让常驻内存从 ~73MB 涨到 ~257MB，而该层默认关闭。
+    bow = compute_bow_keys(gray) if compute_bow else None
 
     small = cv2.resize(gray, (128, 128), interpolation=cv2.INTER_AREA)
     hist = cv2.calcHist([gray], [0], None, [64], [0, 256]).ravel()
@@ -200,11 +218,11 @@ def load_record(path: str, hash_size: int = 16) -> Optional[ImageRecord]:
         w, h = im.size
     return ImageRecord(path=str(Path(path).resolve()), md5=md5, width=w, height=h,
                        gray_std=float(gray.std()), phash=ph, dhash=dh,
-                       geom_hash=geom, sub_hash=sub, hist=hist, gray_small=small)
+                       geom_hash=geom, sub_hash=sub, bow_keys=bow, hist=hist, gray_small=small)
 
 
-def scan_directory(root: str, workers: int = 8, hash_size: int = 16
-                   ) -> List[ImageRecord]:
+def scan_directory(root: str, workers: int = 8, hash_size: int = 16,
+                   compute_bow: bool = False) -> List[ImageRecord]:
     root_p = Path(root)
     paths = []
     seen = set()
@@ -222,7 +240,7 @@ def scan_directory(root: str, workers: int = 8, hash_size: int = 16
 
     out: List[ImageRecord] = []
     with ThreadPoolExecutor(max_workers=workers) as ex:
-        for rec in ex.map(lambda p: load_record(p, hash_size), paths):
+        for rec in ex.map(lambda p: load_record(p, hash_size, compute_bow), paths):
             if rec is not None:
                 out.append(rec)
     return out
@@ -417,7 +435,15 @@ def _apply_geom(gray: np.ndarray, name: str) -> np.ndarray:
         return np.ascontiguousarray(np.rot90(gray, 3))
     if name == 'flipH':
         return np.ascontiguousarray(gray[:, ::-1])
-    return np.ascontiguousarray(gray[::-1, :])
+    if name == 'flipV':
+        return np.ascontiguousarray(gray[::-1, :])
+    if name.startswith('rot'):
+        ang = int(name[3:])
+        h, w = gray.shape[:2]
+        M = cv2.getRotationMatrix2D((w / 2, h / 2), ang, 1.0)
+        return cv2.warpAffine(gray, M, (w, h), flags=cv2.INTER_LINEAR,
+                              borderMode=cv2.BORDER_REPLICATE)
+    raise ValueError(name)
 
 
 def verify_pair(r1: ImageRecord, r2: ImageRecord,
@@ -494,7 +520,29 @@ def find_cross_duplicates(records: Sequence[ImageRecord],
                           subimage_threshold: float = 0.85,
                           detect_edge: bool = True,
                           edge_threshold: float = 0.55,
-                          max_subimage_pairs: int = 4000) -> List[CrossMatch]:
+                          max_subimage_pairs: int = 4000,
+                          candidate_threshold: int = 0,
+                          use_bow: bool = False,
+                          bow_min_shared: int = 8) -> List[CrossMatch]:
+    """
+    candidate_threshold: 候选生成的 pHash 距离上限（0 = 用 phash_threshold*2）。
+    单独暴露出来是因为**候选层与判定层的最优阈值不同**：
+    任意角度旋转副本的哈希距离实测约 36/256（见 COMPARISON.md），
+    按 24 卡会整类漏掉；而判定层有投票+NCC+退化检测兜底，
+    放宽候选不会同比例放大误报。
+
+    use_bow: ORB 词袋候选层，**默认关闭**。
+    移植自 master 线后实测**没有产生收益**：master 基准上召回仍是 0.655
+    （23/92 种变换组合依旧 0 召回），而 1200 张基准上精确率 1.000→0.823
+    （41 个误报）、检测耗时 2.46s→56.4s。
+    原因：BOW 只是把候选放进来了，但这些「组合变换」候选（裁剪∘旋转等）
+    在判定层被整图结构投票（pHash/dHash/SSIM）否决 ——
+    master 的召回优势其实来自它**判定层**接受「部分证据」
+    （逐对 SIFT + 覆盖率判据 + 边缘重叠 + 子图），而不是候选索引。
+    只移植候选层无法复现该收益。代码保留，供将来重做判定层时启用。
+    """
+    if candidate_threshold <= 0:
+        candidate_threshold = max(phash_threshold * 2, 40)
     n = len(records)
     matches: List[CrossMatch] = []
 
@@ -516,15 +564,26 @@ def find_cross_duplicates(records: Sequence[ImageRecord],
                     exact_pairs.add((i, j))
 
     # 2) 多变换哈希候选（含旋转/翻转）
-    cand = geometric_candidates(records, max_dist=phash_threshold * 2)
+    cand = geometric_candidates(records, max_dist=candidate_threshold)
     cand = {k: v for k, v in cand.items() if k not in exact_pairs}
 
     if verbose:
         print(f'  多变换哈希候选: {len(cand)} 对 (共 {n} 张, 朴素 {n*(n-1)//2} 对)')
 
+    # 2b) ORB 词袋候选：哈希层对「变换的组合」（裁剪∘旋转、镜像∘任意角旋转）
+    #     无能为力 —— 实测把候选阈值从 24 放宽到 64 也只多 1.3% 召回。
+    #     ORB 描述子天生抗旋转/缩放，用来补这一类。
+    bow_cand = {}
+    if use_bow and n >= 2:
+        bow_cand = bow_candidates([r.bow_keys or set() for r in records],
+                                  min_shared=bow_min_shared)
+        bow_cand = {k: v for k, v in bow_cand.items() if k not in exact_pairs}
+        if verbose:
+            print(f'  ORB 词袋候选: {len(bow_cand)} 对 (共享词 >= {bow_min_shared})')
+
     # 3) 投票验证 + 边缘拼接
     reported = set(exact_pairs)
-    for (i, j), hd in cand.items():
+    for (i, j) in sorted(set(cand) | set(bow_cand)):
         m = verify_pair(records[i], records[j],
                         pthresh=phash_threshold, min_votes=min_votes)
         if m:
