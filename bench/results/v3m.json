@@ -1,0 +1,682 @@
+{
+ "detector": "v3m",
+ "label": "v3m(master)",
+ "data": "D:\\Github\\image_dedup\\bench\\data",
+ "wall_s": 7.81,
+ "timings": {
+  "load_s": null,
+  "detect_s": 7.41,
+  "total_s": 7.41
+ },
+ "memory": {
+  "rss_start_mb": 51.5,
+  "rss_peak_mb": 329.2
+ },
+ "n_images": 140,
+ "error": null,
+ "cross": {
+  "overall": {
+   "tp": 21,
+   "fp": 114,
+   "fn": 3,
+   "precision": 0.1556,
+   "recall": 0.875,
+   "f1": 0.2642
+  },
+  "by_transform": {
+   "brightness": {
+    "hit": 1,
+    "total": 2,
+    "recall": 0.5
+   },
+   "contrast": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "crop60": {
+    "hit": 0,
+    "total": 1,
+    "recall": 0.0
+   },
+   "crop80": {
+    "hit": 0,
+    "total": 1,
+    "recall": 0.0
+   },
+   "exact": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "flipH": {
+    "hit": 1,
+    "total": 1,
+    "recall": 1.0
+   },
+   "flipV": {
+    "hit": 1,
+    "total": 1,
+    "recall": 1.0
+   },
+   "gamma": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "jpeg55": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "noise": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "recompress": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "rot180": {
+    "hit": 1,
+    "total": 1,
+    "recall": 1.0
+   },
+   "rot90": {
+    "hit": 1,
+    "total": 1,
+    "recall": 1.0
+   },
+   "scale075": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "scale150": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   }
+  },
+  "by_naming": {
+   "channel_alias": {
+    "hit": 6,
+    "total": 6,
+    "recall": 1.0
+   },
+   "renamed": {
+    "hit": 5,
+    "total": 6,
+    "recall": 0.833
+   },
+   "same_base": {
+    "hit": 10,
+    "total": 12,
+    "recall": 0.833
+   }
+  },
+  "missed_positives": [
+   {
+    "transform": "crop80",
+    "naming": "renamed",
+    "a": "gel_cond4_1.jpg",
+    "b": "gel_cond4_2.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "same_base",
+    "a": "barplot_cond0_1.jpg",
+    "b": "barplot_cond0_1_rep.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "same_base",
+    "a": "blot_cond3_1.jpg",
+    "b": "blot_cond3_1_rep.jpg"
+   }
+  ],
+  "false_positives": [
+   [
+    "cross/case_016/barplot_cond1_5.jpg",
+    "cross/case_022/barplot_cond2_1_rep.jpg"
+   ],
+   [
+    "cross/case_023/scatter_cond3_4.jpg",
+    "cross/case_023/scatter_cond3_RFP.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_5.jpg",
+    "cross/case_011/scatter_cond1_GFP.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_2.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_1.jpg",
+    "cross/case_023/scatter_cond3_5.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_1.jpg",
+    "cross/case_017/scatter_cond2_4.jpg"
+   ],
+   [
+    "cross/case_004/barplot_cond4_1.jpg",
+    "cross/case_022/barplot_cond2_1_rep.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_1.jpg",
+    "cross/case_011/scatter_cond1_RFP.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_5.jpg",
+    "cross/case_011/scatter_cond1_GFP.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_4.jpg",
+    "cross/case_017/scatter_cond2_3.jpg"
+   ],
+   [
+    "intra/fig_010.png",
+    "intra/fig_016.png"
+   ],
+   [
+    "cross/case_005/scatter_cond0_1.jpg",
+    "cross/case_011/scatter_cond1_3.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_2.jpg",
+    "cross/case_011/scatter_cond1_3.jpg"
+   ],
+   [
+    "cross/case_023/scatter_cond3_4.jpg",
+    "cross/case_023/scatter_cond3_GFP.jpg"
+   ],
+   [
+    "cross/case_004/barplot_cond4_1_rep.jpg",
+    "cross/case_016/barplot_cond1_5.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_3.jpg",
+    "cross/case_023/scatter_cond3_3.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_GFP.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_2.jpg",
+    "cross/case_023/scatter_cond3_GFP.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_3.jpg",
+    "cross/case_017/scatter_cond2_5.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_2.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_2.jpg",
+    "cross/case_023/scatter_cond3_3.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_5.jpg",
+    "cross/case_023/scatter_cond3_GFP.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_5.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_5.jpg",
+    "cross/case_017/scatter_cond2_2.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_4.jpg",
+    "cross/case_011/scatter_cond1_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_3.jpg",
+    "cross/case_005/scatter_cond0_4.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_3.jpg",
+    "cross/case_017/scatter_cond2_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_3.jpg",
+    "cross/case_017/scatter_cond2_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_3.jpg",
+    "cross/case_017/scatter_cond2_3.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_4.jpg",
+    "cross/case_017/scatter_cond2_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_1.jpg",
+    "cross/case_005/scatter_cond0_5.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_5.jpg",
+    "cross/case_023/scatter_cond3_3.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_RFP.jpg",
+    "cross/case_023/scatter_cond3_GFP.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_1.jpg",
+    "cross/case_017/scatter_cond2_3.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_1.jpg",
+    "cross/case_017/scatter_cond2_5.jpg"
+   ],
+   [
+    "cross/case_016/barplot_cond1_5.jpg",
+    "cross/case_022/barplot_cond2_4.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_RFP.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_1.jpg",
+    "cross/case_023/scatter_cond3_3.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_1.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_5.jpg",
+    "cross/case_011/scatter_cond1_RFP.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_4.jpg",
+    "cross/case_023/scatter_cond3_GFP.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_3.jpg",
+    "cross/case_011/scatter_cond1_RFP.jpg"
+   ],
+   [
+    "cross/case_022/barplot_cond2_3.jpg",
+    "cross/case_022/barplot_cond2_5.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_5.jpg",
+    "cross/case_011/scatter_cond1_RFP.jpg"
+   ],
+   [
+    "cross/case_023/scatter_cond3_3.jpg",
+    "cross/case_023/scatter_cond3_GFP.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_2.jpg",
+    "cross/case_005/scatter_cond0_3.jpg"
+   ],
+   [
+    "cross/case_023/scatter_cond3_3.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_023/scatter_cond3_4.jpg",
+    "cross/case_023/scatter_cond3_5.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_1.jpg",
+    "cross/case_005/scatter_cond0_3.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_4.jpg",
+    "cross/case_017/scatter_cond2_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_5.jpg",
+    "cross/case_017/scatter_cond2_5.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_5.jpg",
+    "cross/case_017/scatter_cond2_3.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_5.jpg",
+    "cross/case_023/scatter_cond3_3.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_3.jpg",
+    "cross/case_023/scatter_cond3_GFP.jpg"
+   ],
+   [
+    "cross/case_004/barplot_cond4_1.jpg",
+    "cross/case_016/barplot_cond1_5.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_4.jpg",
+    "cross/case_023/scatter_cond3_GFP.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_1.jpg",
+    "cross/case_011/scatter_cond1_5.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_3.jpg",
+    "cross/case_011/scatter_cond1_GFP.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_4.jpg",
+    "cross/case_011/scatter_cond1_GFP.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_4.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_4.jpg",
+    "cross/case_023/scatter_cond3_3.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_RFP.jpg",
+    "cross/case_017/scatter_cond2_1.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_1.jpg",
+    "cross/case_023/scatter_cond3_GFP.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_3.jpg",
+    "cross/case_010/barplot_cond0_5.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_3.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_5.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_1.jpg",
+    "cross/case_017/scatter_cond2_1.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_3.jpg",
+    "cross/case_017/scatter_cond2_5.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_3.jpg",
+    "cross/case_017/scatter_cond2_3.jpg"
+   ],
+   [
+    "intra/fig_004.png",
+    "intra/fig_016.png"
+   ],
+   [
+    "cross/case_017/scatter_cond2_5.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_3.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_2.jpg",
+    "cross/case_017/scatter_cond2_3.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_3.jpg",
+    "cross/case_023/scatter_cond3_5.jpg"
+   ],
+   [
+    "cross/case_004/barplot_cond4_1.jpg",
+    "cross/case_022/barplot_cond2_4.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_5.jpg",
+    "cross/case_017/scatter_cond2_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_2.jpg",
+    "cross/case_005/scatter_cond0_5.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_4.jpg",
+    "cross/case_011/scatter_cond1_RFP.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_3.jpg",
+    "cross/case_017/scatter_cond2_1.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_GFP.jpg",
+    "cross/case_017/scatter_cond2_3.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_GFP.jpg",
+    "cross/case_017/scatter_cond2_5.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_4.jpg",
+    "cross/case_011/scatter_cond1_5.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_GFP.jpg",
+    "cross/case_017/scatter_cond2_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_4.jpg",
+    "cross/case_022/barplot_cond2_5.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_5.jpg",
+    "cross/case_017/scatter_cond2_1.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_3.jpg",
+    "cross/case_023/scatter_cond3_3.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_2.jpg",
+    "cross/case_023/scatter_cond3_GFP.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_5.jpg",
+    "cross/case_017/scatter_cond2_1.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_2.jpg",
+    "cross/case_011/scatter_cond1_RFP.jpg"
+   ],
+   [
+    "cross/case_004/barplot_cond4_5.jpg",
+    "cross/case_010/barplot_cond0_4.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_5.jpg",
+    "cross/case_017/scatter_cond2_5.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_5.jpg",
+    "cross/case_017/scatter_cond2_3.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_3.jpg",
+    "cross/case_011/scatter_cond1_GFP.jpg"
+   ],
+   [
+    "intra/fig_003.png",
+    "intra/fig_009.png"
+   ],
+   [
+    "cross/case_017/scatter_cond2_2.jpg",
+    "cross/case_017/scatter_cond2_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_3.jpg",
+    "cross/case_023/scatter_cond3_5.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_1.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_4.jpg",
+    "cross/case_023/scatter_cond3_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_2.jpg",
+    "cross/case_017/scatter_cond2_1.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_GFP.jpg",
+    "cross/case_017/scatter_cond2_1.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_2.jpg",
+    "cross/case_011/scatter_cond1_5.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_1.jpg",
+    "cross/case_023/scatter_cond3_GFP.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_3.jpg",
+    "cross/case_017/scatter_cond2_4.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_4.jpg",
+    "cross/case_023/scatter_cond3_RFP.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_1.jpg",
+    "cross/case_023/scatter_cond3_RFP.jpg"
+   ],
+   [
+    "cross/case_004/barplot_cond4_1_rep.jpg",
+    "cross/case_022/barplot_cond2_4.jpg"
+   ],
+   [
+    "cross/case_017/scatter_cond2_4.jpg",
+    "cross/case_023/scatter_cond3_5.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_3.jpg",
+    "cross/case_011/scatter_cond1_RFP.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_RFP.jpg",
+    "cross/case_017/scatter_cond2_2.jpg"
+   ],
+   [
+    "cross/case_023/scatter_cond3_3.jpg",
+    "cross/case_023/scatter_cond3_5.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_4.jpg",
+    "cross/case_017/scatter_cond2_1.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_2.jpg",
+    "cross/case_017/scatter_cond2_4.jpg"
+   ],
+   [
+    "cross/case_005/scatter_cond0_2.jpg",
+    "cross/case_023/scatter_cond3_5.jpg"
+   ],
+   [
+    "cross/case_011/scatter_cond1_GFP.jpg",
+    "cross/case_023/scatter_cond3_5.jpg"
+   ]
+  ]
+ },
+ "intra": {
+  "region": {
+   "tp": 0,
+   "fp": 0,
+   "fn": 20,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0
+  },
+  "figure": {
+   "tp": 0,
+   "fp": 0,
+   "fn": 20,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0
+  },
+  "mean_iou": 0.0,
+  "median_center_err_px": null,
+  "by_relation": {
+   "copymove_within": {
+    "hit": 0,
+    "total": 2,
+    "recall": 0.0,
+    "mean_iou": 0.0
+   },
+   "panel_partial_overlap": {
+    "hit": 0,
+    "total": 2,
+    "recall": 0.0,
+    "mean_iou": 0.0
+   },
+   "panel_reuse_brightness": {
+    "hit": 0,
+    "total": 2,
+    "recall": 0.0,
+    "mean_iou": 0.0
+   },
+   "panel_reuse_contrast": {
+    "hit": 0,
+    "total": 2,
+    "recall": 0.0,
+    "mean_iou": 0.0
+   },
+   "panel_reuse_crop": {
+    "hit": 0,
+    "total": 2,
+    "recall": 0.0,
+    "mean_iou": 0.0
+   },
+   "panel_reuse_exact": {
+    "hit": 0,
+    "total": 2,
+    "recall": 0.0,
+    "mean_iou": 0.0
+   },
+   "panel_reuse_flipH": {
+    "hit": 0,
+    "total": 2,
+    "recall": 0.0,
+    "mean_iou": 0.0
+   },
+   "panel_reuse_recompress": {
+    "hit": 0,
+    "total": 2,
+    "recall": 0.0,
+    "mean_iou": 0.0
+   },
+   "panel_reuse_rot180": {
+    "hit": 0,
+    "total": 2,
+    "recall": 0.0,
+    "mean_iou": 0.0
+   },
+   "panel_reuse_scale075": {
+    "hit": 0,
+    "total": 2,
+    "recall": 0.0,
+    "mean_iou": 0.0
+   }
+  },
+  "capability": true
+ }
+}

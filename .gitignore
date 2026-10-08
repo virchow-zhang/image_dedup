@@ -36,5 +36,8 @@ bench/results/*
 !bench/results/cmp_*.md
 !bench/results/v2_baseline.json
 !bench/results/v2_scale.json
-!bench/results/v3.json
+!bench/results/v3pure.json
 !bench/results/v3_scale.json
+!bench/results/v3m.json
+!bench/results/v4_120.json
+!bench/results/v4_1200.json

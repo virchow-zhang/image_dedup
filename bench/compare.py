@@ -50,8 +50,16 @@ def table(rows, title):
              '|' + '---|' * len(hdr)]
 
     def add(name, fn, fmt='{}'):
-        lines.append('| ' + name + ' | ' +
-                     ' | '.join(fmt.format(fn(r)) for r in rows) + ' |')
+        cells = []
+        for r in rows:
+            v = fn(r)
+            if v is None:
+                cells.append('—')
+            elif isinstance(v, str):
+                cells.append(v)
+            else:
+                cells.append(fmt.format(v))
+        lines.append('| ' + name + ' | ' + ' | '.join(cells) + ' |')
 
     add('图片数', lambda r: r['n'] or 0)
     add('**跨文件查重**', lambda r: '')

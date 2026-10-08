@@ -1,9 +1,9 @@
 @echo off
 chcp 65001 >nul
-title 科研图片查重工具 v3
+title 科研图片查重工具 v4
 
 echo ============================================================
-echo   🔬 科研图片查重工具 v3
+echo   🔬 科研图片查重工具 v4
 echo   跨文件查重 + 图内 panel 复用检测
 echo ============================================================
 echo.
@@ -44,7 +44,7 @@ echo.
 echo ────────────────────────────────────────────────────────────
 echo.
 
-python "%CURRENT_DIR%\image_dedup_v3.py" "%CURRENT_DIR%" --report "%CURRENT_DIR%\report.html"
+python "%CURRENT_DIR%\image_dedup_v4.py" "%CURRENT_DIR%" --report "%CURRENT_DIR%\report.html"
 
 echo.
 echo ────────────────────────────────────────────────────────────

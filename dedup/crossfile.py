@@ -30,6 +30,9 @@ from typing import Dict, List, Optional, Sequence, Tuple
 import cv2
 import numpy as np
 
+from .edge_overlap import check_edge_overlap
+from .subimage import SubimageCache, check_subimage_arrays, subimage_candidate_pairs
+
 IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.bmp', '.tif', '.tiff',
                     '.gif', '.webp', '.svs', '.ndpi', '.vsi'}
 EXCLUDE_DIRS = {'visualization', 'venv', '.git', '__pycache__', 'node_modules',
@@ -57,6 +60,7 @@ class ImageRecord:
     phash: np.ndarray            # 每行 uint64 位（hash_size² 位，packbits 后按 64 对齐）
     dhash: np.ndarray
     geom_hash: Dict[str, np.ndarray] = field(default_factory=dict)
+    sub_hash: Optional[np.ndarray] = None   # (K, words) 若干子窗口的 pHash
     hist: Optional[np.ndarray] = None
     gray_small: Optional[np.ndarray] = None
 
@@ -85,6 +89,31 @@ def _dhash_bits(gray: np.ndarray, hash_size: int) -> np.ndarray:
     return (small[:, 1:] > small[:, :-1]).astype(np.uint8).ravel()
 
 
+# 子窗口布局：(中心相对坐标 x0, y0, 边长占比)。用于「裁剪副本」的候选生成。
+SUB_WINDOWS = (
+    (0.20, 0.20, 0.60),   # 居中 60%
+    (0.10, 0.10, 0.80),   # 居中 80%
+    (0.05, 0.05, 0.70),   # 左上
+    (0.25, 0.05, 0.70),   # 右上
+    (0.05, 0.25, 0.70),   # 左下
+    (0.25, 0.25, 0.70),   # 右下
+)
+
+
+def _subwindow_hashes(gray: np.ndarray, hash_size: int) -> np.ndarray:
+    """各子窗口的 pHash，堆成 (K, words)。"""
+    h, w = gray.shape[:2]
+    out = []
+    for fx, fy, fs in SUB_WINDOWS:
+        x0, y0 = int(w * fx), int(h * fy)
+        sw, sh = int(w * fs), int(h * fs)
+        sub = gray[y0:y0 + sh, x0:x0 + sw]
+        if sub.size == 0:
+            sub = gray
+        out.append(_bits_to_u64(_phash_bits(sub, hash_size)))
+    return np.stack(out)
+
+
 def _md5_streaming(path: str, chunk: int = 1 << 20) -> str:
     h = hashlib.md5()
     with open(path, 'rb') as f:
@@ -94,18 +123,40 @@ def _md5_streaming(path: str, chunk: int = 1 << 20) -> str:
 
 
 def _load_gray(path: str, max_dim: int = 512) -> Optional[np.ndarray]:
-    """读取灰度图；超大图用 PIL draft 降采样解码，避免内存爆炸"""
+    """
+    读取灰度图；超大图用 PIL draft 降采样解码，避免内存爆炸。
+
+    16bit TIF（荧光/共聚焦最常见）不能直接 convert('L')：PIL 会按 8bit 截断，
+    高动态范围图像的绝大部分信息会丢成一片白。这里改用百分位拉伸归一化。
+    """
     from PIL import Image
+    g = None
     try:
         with Image.open(path) as im:
-            im.draft('L', (max_dim, max_dim))
-            g = np.asarray(im.convert('L'))
+            if im.mode in ('I;16', 'I;16B', 'I;16L', 'I', 'F'):
+                arr = np.asarray(im, dtype=np.float32)
+                lo, hi = np.percentile(arr, (1.0, 99.0))
+                if hi - lo < 1e-6:
+                    hi = lo + 1.0
+                g = np.clip((arr - lo) / (hi - lo) * 255.0, 0, 255).astype(np.uint8)
+            else:
+                im.draft('L', (max_dim, max_dim))
+                g = np.asarray(im.convert('L'))
     except Exception:
         g = None
     if g is None:
         g = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
         if g is None:
-            return None
+            import tifffile
+            try:
+                arr = tifffile.imread(path)
+                if arr.ndim == 3:
+                    arr = arr[..., 0]
+                lo, hi = np.percentile(arr.astype(np.float32), (1.0, 99.0))
+                g = np.clip((arr.astype(np.float32) - lo) / max(hi - lo, 1e-6) * 255,
+                            0, 255).astype(np.uint8)
+            except Exception:
+                return None
     if max(g.shape) > max_dim:
         s = max_dim / max(g.shape)
         g = cv2.resize(g, (max(1, int(g.shape[1] * s)), max(1, int(g.shape[0] * s))),
@@ -138,6 +189,7 @@ def load_record(path: str, hash_size: int = 16) -> Optional[ImageRecord]:
     ph = _bits_to_u64(_phash_bits(gray, hash_size))
     dh = _bits_to_u64(_dhash_bits(gray, hash_size))
     geom = {t: _bits_to_u64(_phash_bits(_geom(gray, t), hash_size)) for t in GEOMETRY}
+    sub = _subwindow_hashes(gray, hash_size)
 
     small = cv2.resize(gray, (128, 128), interpolation=cv2.INTER_AREA)
     hist = cv2.calcHist([gray], [0], None, [64], [0, 256]).ravel()
@@ -148,7 +200,7 @@ def load_record(path: str, hash_size: int = 16) -> Optional[ImageRecord]:
         w, h = im.size
     return ImageRecord(path=str(Path(path).resolve()), md5=md5, width=w, height=h,
                        gray_std=float(gray.std()), phash=ph, dhash=dh,
-                       geom_hash=geom, hist=hist, gray_small=small)
+                       geom_hash=geom, sub_hash=sub, hist=hist, gray_small=small)
 
 
 def scan_directory(root: str, workers: int = 8, hash_size: int = 16
@@ -200,6 +252,52 @@ def hamming_close_pairs(hashes: np.ndarray, max_dist: int, chunk: int = 512
             if gi < gj:
                 out.append((gi, gj, int(d[r, c])))
     return out
+
+
+def subwindow_candidates(records: Sequence[ImageRecord], max_dist: int,
+                         chunk: int = 0) -> Dict[Tuple[int, int], Tuple[int, int]]:
+    """
+    用「子窗口哈希」找裁剪候选，复杂度 O(n) 级别而不是 O(n²)。
+
+    做法：给每张图预先算好 K 个子窗口的 pHash。若 B 是 A 的裁剪副本，
+    则 B 的 **整图哈希** 应当接近 A 的 **某个子窗口哈希**。
+    于是索引 K·n 个哈希，比较「所有图的整图哈希」×「所有图的子窗口哈希」。
+
+    为什么必须这么做：按「面积比」枚举候选是 O(n²)——1200 张图会产生
+    60034 个候选，任何上限都只能看前 3%，绝大多数真裁剪根本轮不到。
+    子窗口哈希把候选降到极小且与 n 近似线性。
+
+    返回 {(i, j): (窗口序号, 距离)}，i<j。
+    """
+    n = len(records)
+    best: Dict[Tuple[int, int], Tuple[int, int]] = {}
+    if n < 2 or records[0].sub_hash is None:
+        return best
+
+    wpt = records[0].phash.size
+    k = records[0].sub_hash.shape[0]
+    if chunk <= 0:
+        chunk = max(16, min(512, 8_000_000 // max(n * wpt, 1)))
+
+    ident = np.stack([r.phash for r in records])                 # (n, wpt)
+    subs = np.stack([r.sub_hash for r in records])               # (n, k, wpt)
+
+    for win in range(k):
+        sub_w = subs[:, win, :]                                  # (n, wpt)
+        for a0 in range(0, n, chunk):
+            a1 = min(n, a0 + chunk)
+            xor = ident[a0:a1, None, :] ^ sub_w[None, :, :]
+            cnt = _POPCOUNT[xor.view(np.uint8).reshape(a1 - a0, n, wpt * 8)].sum(-1)
+            rows, cols = np.where(cnt <= max_dist)
+            for r, c in zip(rows, cols):
+                gi, gj = a0 + int(r), int(c)
+                if gi == gj:
+                    continue
+                key = (min(gi, gj), max(gi, gj))
+                v = int(cnt[r, c])
+                if key not in best or v < best[key][1]:
+                    best[key] = (win, v)
+    return best
 
 
 def geometric_candidates(records: Sequence[ImageRecord], max_dist: int,
@@ -391,8 +489,12 @@ def verify_pair(r1: ImageRecord, r2: ImageRecord,
 def find_cross_duplicates(records: Sequence[ImageRecord],
                           phash_threshold: int = 12,
                           min_votes: int = 2,
-                          md5_only_threshold: int = 0,
-                          verbose: bool = False) -> List[CrossMatch]:
+                          verbose: bool = False,
+                          detect_subimage: bool = True,
+                          subimage_threshold: float = 0.85,
+                          detect_edge: bool = True,
+                          edge_threshold: float = 0.55,
+                          max_subimage_pairs: int = 4000) -> List[CrossMatch]:
     n = len(records)
     matches: List[CrossMatch] = []
 
@@ -420,10 +522,64 @@ def find_cross_duplicates(records: Sequence[ImageRecord],
     if verbose:
         print(f'  多变换哈希候选: {len(cand)} 对 (共 {n} 张, 朴素 {n*(n-1)//2} 对)')
 
-    # 3) 投票验证
+    # 3) 投票验证 + 边缘拼接
+    reported = set(exact_pairs)
     for (i, j), hd in cand.items():
         m = verify_pair(records[i], records[j],
                         pthresh=phash_threshold, min_votes=min_votes)
         if m:
             matches.append(m)
+            reported.add((i, j))
+            continue
+        if detect_edge:
+            eo = check_edge_overlap(records[i].gray_small, records[j].gray_small,
+                                    edge_threshold)
+            if eo:
+                direction, score, detail = eo
+                matches.append(CrossMatch(
+                    image1=records[i].path, image2=records[j].path,
+                    severity='high' if score > 0.75 else 'medium',
+                    similarity=round(score, 4), match_type=f'疑似{direction}边缘重叠/拼接',
+                    details=detail, confidence=round(score, 4),
+                    vote_details='edge'))
+
+    # 4) 子图 / 裁剪（整图哈希的天然盲区，需要模板匹配单独兜）
+    #    候选用子窗口哈希生成（O(n)），不再按面积比枚举（O(n²)，1200 张图会
+    #    产生 6 万个候选，任何上限都只能覆盖前 3%）。
+    if detect_subimage and n >= 2:
+        sub_cands = subwindow_candidates(records, max_dist=phash_threshold * 2)
+        # 面积比做二次确认：真裁剪必然一大一小
+        filtered = []
+        for (i, j), (win, dist) in sub_cands.items():
+            if (i, j) in reported:
+                continue
+            a1 = records[i].width * records[i].height
+            a2 = records[j].width * records[j].height
+            ratio = max(a1, a2) / max(min(a1, a2), 1)
+            if not (1.25 <= ratio <= 6.0):
+                continue
+            big_i, small_i = (i, j) if a1 >= a2 else (j, i)
+            filtered.append((dist, big_i, small_i))
+
+        filtered.sort()                     # 哈希最接近的先查
+        filtered = filtered[:max_subimage_pairs]
+        cache = SubimageCache()
+        hits = 0
+        for dist, big_i, small_i in filtered:
+            res = check_subimage_arrays(cache.get(records[big_i].path),
+                                        cache.get(records[small_i].path),
+                                        subimage_threshold)
+            if res:
+                x, y, w, h = res['box']
+                matches.append(CrossMatch(
+                    image1=records[big_i].path, image2=records[small_i].path,
+                    severity='critical', similarity=round(res['score'], 4),
+                    match_type='疑似子图/裁剪',
+                    details=(f"小图匹配到大图位置({x},{y})，缩放比 {res['scale']:.2f}，"
+                             f"相关系数 {res['score']:.3f}"),
+                    confidence=round(res['score'], 4), vote_details='subimage'))
+                hits += 1
+        if verbose:
+            print(f'  子图/裁剪候选: {len(sub_cands)} → 过滤后 {len(filtered)} 对 → 命中 {hits}')
+
     return matches

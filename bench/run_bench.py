@@ -201,6 +201,143 @@ def run_v3(data_dir: Path, workers: int = 8, **kw):
     }
 
 
+# ---------------------------------------------------------------- master 线 v3.0
+
+MASTER_ROOT = REPO.parent / 'image_dedup_master'
+
+
+def run_v3m(data_dir: Path, workers: int = 8, **kw):
+    """
+    master 分支那条独立的 v3.0（三层流水线 + C++ 内核 + CMFD）。
+    用同一套评分标准跑，才能和 main 线的 v3 直接比。
+    """
+    import psutil
+    if not (MASTER_ROOT / 'image_dedup.py').exists():
+        raise RuntimeError(f'未找到 master worktree: {MASTER_ROOT}'
+                           '（git worktree add ../image_dedup_master archive/master-v3-2026-08）')
+
+    import yaml
+    sys.path.insert(0, str(MASTER_ROOT))
+    cwd = os.getcwd()
+    os.chdir(MASTER_ROOT)          # master 用相对路径读 config.yaml
+    try:
+        from core.engine import run_detection
+        cfg = yaml.safe_load((MASTER_ROOT / 'config.yaml').read_text(encoding='utf-8'))
+        cfg['scan']['directory'] = str(data_dir)
+        cfg['scan']['max_workers'] = workers
+        cfg['report']['clean_output'] = False
+        cfg['ai']['enabled'] = False
+
+        proc = psutil.Process()
+        mem0 = proc.memory_info().rss
+        peak = [mem0]
+
+        t0 = time.perf_counter()
+        with capture_stdout() as log:
+            infos, matches, cmfd = run_detection(str(data_dir), cfg)
+        elapsed = time.perf_counter() - t0
+        peak.append(proc.memory_info().rss)
+    finally:
+        os.chdir(cwd)
+        sys.path.remove(str(MASTER_ROOT))
+
+    dres = data_dir.resolve()
+
+    def _rel(p):
+        try:
+            return Path(p).resolve().relative_to(dres).as_posix()
+        except ValueError:
+            return None
+
+    cross_pairs = []
+    for m in matches:
+        a, b = _rel(m.image1), _rel(m.image2)
+        if a and b and a != b:
+            cross_pairs.append(sorted([a, b]))
+
+    # CMFD（图内复制）本身就是「同图两个区域同源」，与 main 线图内检测同一任务
+    findings = []
+    for m in (cmfd or []):
+        f = _rel(m.image1)
+        if not f or not m.region1 or not m.region2:
+            continue
+        findings.append({'figure': f,
+                         'a_bbox': [int(v) for v in m.region1],
+                         'b_bbox': [int(v) for v in m.region2],
+                         'transform': getattr(m, 'transform_type', '') or '',
+                         'ncc': float(m.similarity or 0),
+                         'n_inliers': int(getattr(m, 'inlier_count', 0) or 0),
+                         'score': float(m.similarity or 0),
+                         'a_panel': None, 'b_panel': None})
+
+    return {
+        'detector': 'v3m',
+        'cross_pairs': cross_pairs,
+        'intra_findings': findings,
+        'intra_supported': bool(cmfd),
+        'timings': {'load_s': None, 'detect_s': round(elapsed, 2),
+                    'total_s': round(elapsed, 2)},
+        'memory': {'rss_start_mb': round(mem0 / 2**20, 1),
+                   'rss_peak_mb': round(max(peak) / 2**20, 1)},
+        'n_images': len(infos),
+        'log': log.getvalue(),
+    }
+
+
+def run_v3_pure(data_dir: Path, workers: int = 8, **kw):
+    """main 线 v3 的原貌：关掉 v4 新整合的子图/边缘两层，用于对比。"""
+    sys.path.insert(0, str(REPO))
+    import cv2
+    import psutil
+    from dedup.crossfile import find_cross_duplicates, scan_directory
+    from dedup.features import find_region_matches
+
+    proc = psutil.Process()
+    mem0 = proc.memory_info().rss
+    t0 = time.perf_counter()
+    recs = scan_directory(str(data_dir / 'cross'), workers=workers)
+    t_load = time.perf_counter() - t0
+    t1 = time.perf_counter()
+    ms = find_cross_duplicates(recs, detect_subimage=False, detect_edge=False)
+    t_det = time.perf_counter() - t1
+    peak = proc.memory_info().rss
+
+    dres = data_dir.resolve()
+    pairs = []
+    for m in ms:
+        try:
+            a = Path(m.image1).resolve().relative_to(dres).as_posix()
+            b = Path(m.image2).resolve().relative_to(dres).as_posix()
+        except ValueError:
+            continue
+        pairs.append(sorted([a, b]))
+
+    t2 = time.perf_counter()
+    findings = []
+    for fig in sorted((data_dir / 'intra').glob('*')):
+        if not fig.is_file():
+            continue
+        img = cv2.imread(str(fig))
+        if img is None:
+            continue
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        for m in find_region_matches(gray):
+            findings.append({'figure': f'intra/{fig.name}', 'a_bbox': m.a_bbox,
+                             'b_bbox': m.b_bbox, 'transform': m.transform,
+                             'ncc': m.ncc, 'n_inliers': m.n_inliers,
+                             'score': m.score, 'a_panel': None, 'b_panel': None})
+    t_intra = time.perf_counter() - t2
+
+    return {'detector': 'v3', 'cross_pairs': pairs, 'intra_findings': findings,
+            'intra_supported': True,
+            'timings': {'load_s': round(t_load, 2), 'detect_s': round(t_det, 2),
+                        'intra_s': round(t_intra, 2),
+                        'total_s': round(t_load + t_det + t_intra, 2)},
+            'memory': {'rss_start_mb': round(mem0 / 2**20, 1),
+                       'rss_peak_mb': round(peak / 2**20, 1)},
+            'n_images': len(recs), 'log': ''}
+
+
 # ---------------------------------------------------------------- 评测
 
 
@@ -326,7 +463,7 @@ def score_intra(res, gt):
 # ---------------------------------------------------------------- main
 
 
-DETECTORS = {'v2': run_v2, 'v3': run_v3}
+DETECTORS = {'v2': run_v2, 'v3': run_v3_pure, 'v4': run_v3, 'v3m': run_v3m}
 
 
 def main():

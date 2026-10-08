@@ -1,17 +1,17 @@
 {
  "detector": "v3",
- "label": "v3_120",
+ "label": "v3",
  "data": "D:\\Github\\image_dedup\\bench\\data",
- "wall_s": 4.46,
+ "wall_s": 3.73,
  "timings": {
-  "load_s": 0.26,
+  "load_s": 0.31,
   "detect_s": 0.04,
-  "intra_s": 4.08,
-  "total_s": 4.38
+  "intra_s": 3.31,
+  "total_s": 3.66
  },
  "memory": {
-  "rss_start_mb": 48.0,
-  "rss_peak_mb": 79.6
+  "rss_start_mb": 48.1,
+  "rss_peak_mb": 58.5
  },
  "n_images": 120,
  "error": null,
