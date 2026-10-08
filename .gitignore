@@ -23,3 +23,18 @@ build/
 # 系统文件
 Thumbs.db
 .DS_Store
+
+# 个人编辑器设置
+.vscode/
+
+# 基准数据：可由 bench/gen_dataset.py 重新生成
+bench/data/
+bench/data_scale/
+
+# 基准运行产物：只保留可审计的结果 json 与对比表
+bench/results/*
+!bench/results/cmp_*.md
+!bench/results/v2_baseline.json
+!bench/results/v2_scale.json
+!bench/results/v3.json
+!bench/results/v3_scale.json

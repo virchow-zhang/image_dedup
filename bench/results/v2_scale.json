@@ -1,0 +1,1111 @@
+{
+ "detector": "v2",
+ "label": "v2 @1200",
+ "data": "D:\\Github\\image_dedup\\bench\\data_scale",
+ "wall_s": 24.22,
+ "timings": {
+  "load_s": 9.96,
+  "detect_s": 14.07,
+  "total_s": 24.03
+ },
+ "memory": {
+  "rss_start_mb": 42.7,
+  "rss_peak_mb": 410.0
+ },
+ "n_images": 1200,
+ "error": null,
+ "cross": {
+  "overall": {
+   "tp": 82,
+   "fp": 64,
+   "fn": 118,
+   "precision": 0.5616,
+   "recall": 0.41,
+   "f1": 0.474
+  },
+  "by_transform": {
+   "brightness": {
+    "hit": 2,
+    "total": 14,
+    "recall": 0.143
+   },
+   "contrast": {
+    "hit": 10,
+    "total": 14,
+    "recall": 0.714
+   },
+   "crop60": {
+    "hit": 1,
+    "total": 13,
+    "recall": 0.077
+   },
+   "crop80": {
+    "hit": 0,
+    "total": 13,
+    "recall": 0.0
+   },
+   "exact": {
+    "hit": 14,
+    "total": 14,
+    "recall": 1.0
+   },
+   "flipH": {
+    "hit": 0,
+    "total": 13,
+    "recall": 0.0
+   },
+   "flipV": {
+    "hit": 0,
+    "total": 13,
+    "recall": 0.0
+   },
+   "gamma": {
+    "hit": 10,
+    "total": 13,
+    "recall": 0.769
+   },
+   "jpeg55": {
+    "hit": 10,
+    "total": 14,
+    "recall": 0.714
+   },
+   "noise": {
+    "hit": 5,
+    "total": 13,
+    "recall": 0.385
+   },
+   "recompress": {
+    "hit": 11,
+    "total": 14,
+    "recall": 0.786
+   },
+   "rot180": {
+    "hit": 0,
+    "total": 13,
+    "recall": 0.0
+   },
+   "rot90": {
+    "hit": 0,
+    "total": 13,
+    "recall": 0.0
+   },
+   "scale075": {
+    "hit": 9,
+    "total": 13,
+    "recall": 0.692
+   },
+   "scale150": {
+    "hit": 10,
+    "total": 13,
+    "recall": 0.769
+   }
+  },
+  "by_naming": {
+   "channel_alias": {
+    "hit": 4,
+    "total": 50,
+    "recall": 0.08
+   },
+   "renamed": {
+    "hit": 28,
+    "total": 50,
+    "recall": 0.56
+   },
+   "same_base": {
+    "hit": 50,
+    "total": 100,
+    "recall": 0.5
+   }
+  },
+  "missed_positives": [
+   {
+    "transform": "brightness",
+    "naming": "channel_alias",
+    "a": "gel_cond3_GFP.jpg",
+    "b": "gel_cond3_RFP.jpg"
+   },
+   {
+    "transform": "noise",
+    "naming": "same_base",
+    "a": "blot_cond1_1.jpg",
+    "b": "blot_cond1_1_rep.jpg"
+   },
+   {
+    "transform": "scale075",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond2_GFP.jpg",
+    "b": "fluorescence_cond2_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "renamed",
+    "a": "gel_cond4_1.jpg",
+    "b": "gel_cond4_2.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "channel_alias",
+    "a": "scatter_cond1_GFP.jpg",
+    "b": "scatter_cond1_RFP.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "same_base",
+    "a": "blot_cond2_1.jpg",
+    "b": "blot_cond2_1_rep.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "renamed",
+    "a": "fluorescence_cond3_1.jpg",
+    "b": "fluorescence_cond3_2.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "same_base",
+    "a": "histology_cond4_1.jpg",
+    "b": "histology_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "same_base",
+    "a": "blot_cond3_1.jpg",
+    "b": "blot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "contrast",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond4_GFP.jpg",
+    "b": "fluorescence_cond4_RFP.jpg"
+   },
+   {
+    "transform": "scale150",
+    "naming": "channel_alias",
+    "a": "scatter_cond3_GFP.jpg",
+    "b": "scatter_cond3_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "same_base",
+    "a": "blot_cond4_1.jpg",
+    "b": "blot_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "renamed",
+    "a": "fluorescence_cond0_1.jpg",
+    "b": "fluorescence_cond0_2.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "same_base",
+    "a": "histology_cond1_1.jpg",
+    "b": "histology_cond1_1_rep.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "channel_alias",
+    "a": "gel_cond2_GFP.jpg",
+    "b": "gel_cond2_RFP.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "same_base",
+    "a": "barplot_cond3_1.jpg",
+    "b": "barplot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "renamed",
+    "a": "scatter_cond4_1.jpg",
+    "b": "scatter_cond4_2.jpg"
+   },
+   {
+    "transform": "recompress",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond1_GFP.jpg",
+    "b": "fluorescence_cond1_RFP.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "renamed",
+    "a": "gel_cond3_1.jpg",
+    "b": "gel_cond3_2.jpg"
+   },
+   {
+    "transform": "gamma",
+    "naming": "channel_alias",
+    "a": "scatter_cond0_GFP.jpg",
+    "b": "scatter_cond0_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "channel_alias",
+    "a": "gel_cond4_GFP.jpg",
+    "b": "gel_cond4_RFP.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "same_base",
+    "a": "barplot_cond0_1.jpg",
+    "b": "barplot_cond0_1_rep.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "renamed",
+    "a": "scatter_cond1_1.jpg",
+    "b": "scatter_cond1_2.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "same_base",
+    "a": "blot_cond2_1.jpg",
+    "b": "blot_cond2_1_rep.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond3_GFP.jpg",
+    "b": "fluorescence_cond3_RFP.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "same_base",
+    "a": "histology_cond4_1.jpg",
+    "b": "histology_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "jpeg55",
+    "naming": "channel_alias",
+    "a": "scatter_cond2_GFP.jpg",
+    "b": "scatter_cond2_RFP.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "same_base",
+    "a": "blot_cond3_1.jpg",
+    "b": "blot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "noise",
+    "naming": "channel_alias",
+    "a": "gel_cond1_GFP.jpg",
+    "b": "gel_cond1_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "same_base",
+    "a": "blot_cond4_1.jpg",
+    "b": "blot_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond0_GFP.jpg",
+    "b": "fluorescence_cond0_RFP.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "same_base",
+    "a": "histology_cond1_1.jpg",
+    "b": "histology_cond1_1_rep.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "renamed",
+    "a": "gel_cond2_1.jpg",
+    "b": "gel_cond2_2.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "same_base",
+    "a": "barplot_cond3_1.jpg",
+    "b": "barplot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "channel_alias",
+    "a": "scatter_cond4_GFP.jpg",
+    "b": "scatter_cond4_RFP.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "channel_alias",
+    "a": "gel_cond3_GFP.jpg",
+    "b": "gel_cond3_RFP.jpg"
+   },
+   {
+    "transform": "noise",
+    "naming": "same_base",
+    "a": "blot_cond1_1.jpg",
+    "b": "blot_cond1_1_rep.jpg"
+   },
+   {
+    "transform": "scale075",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond2_GFP.jpg",
+    "b": "fluorescence_cond2_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "renamed",
+    "a": "gel_cond4_1.jpg",
+    "b": "gel_cond4_2.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "same_base",
+    "a": "barplot_cond0_1.jpg",
+    "b": "barplot_cond0_1_rep.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "channel_alias",
+    "a": "scatter_cond1_GFP.jpg",
+    "b": "scatter_cond1_RFP.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "same_base",
+    "a": "blot_cond2_1.jpg",
+    "b": "blot_cond2_1_rep.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "renamed",
+    "a": "fluorescence_cond3_1.jpg",
+    "b": "fluorescence_cond3_2.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "same_base",
+    "a": "histology_cond4_1.jpg",
+    "b": "histology_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "same_base",
+    "a": "blot_cond3_1.jpg",
+    "b": "blot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "contrast",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond4_GFP.jpg",
+    "b": "fluorescence_cond4_RFP.jpg"
+   },
+   {
+    "transform": "scale150",
+    "naming": "channel_alias",
+    "a": "scatter_cond3_GFP.jpg",
+    "b": "scatter_cond3_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "same_base",
+    "a": "blot_cond4_1.jpg",
+    "b": "blot_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "renamed",
+    "a": "fluorescence_cond0_1.jpg",
+    "b": "fluorescence_cond0_2.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "same_base",
+    "a": "histology_cond1_1.jpg",
+    "b": "histology_cond1_1_rep.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "channel_alias",
+    "a": "gel_cond2_GFP.jpg",
+    "b": "gel_cond2_RFP.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "same_base",
+    "a": "barplot_cond3_1.jpg",
+    "b": "barplot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "renamed",
+    "a": "scatter_cond4_1.jpg",
+    "b": "scatter_cond4_2.jpg"
+   },
+   {
+    "transform": "recompress",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond1_GFP.jpg",
+    "b": "fluorescence_cond1_RFP.jpg"
+   },
+   {
+    "transform": "gamma",
+    "naming": "channel_alias",
+    "a": "scatter_cond0_GFP.jpg",
+    "b": "scatter_cond0_RFP.jpg"
+   },
+   {
+    "transform": "noise",
+    "naming": "same_base",
+    "a": "blot_cond1_1.jpg",
+    "b": "blot_cond1_1_rep.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "channel_alias",
+    "a": "gel_cond4_GFP.jpg",
+    "b": "gel_cond4_RFP.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "same_base",
+    "a": "barplot_cond0_1.jpg",
+    "b": "barplot_cond0_1_rep.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "renamed",
+    "a": "scatter_cond1_1.jpg",
+    "b": "scatter_cond1_2.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "same_base",
+    "a": "blot_cond2_1.jpg",
+    "b": "blot_cond2_1_rep.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond3_GFP.jpg",
+    "b": "fluorescence_cond3_RFP.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "same_base",
+    "a": "histology_cond4_1.jpg",
+    "b": "histology_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "jpeg55",
+    "naming": "channel_alias",
+    "a": "scatter_cond2_GFP.jpg",
+    "b": "scatter_cond2_RFP.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "same_base",
+    "a": "blot_cond3_1.jpg",
+    "b": "blot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "noise",
+    "naming": "channel_alias",
+    "a": "gel_cond1_GFP.jpg",
+    "b": "gel_cond1_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "same_base",
+    "a": "blot_cond4_1.jpg",
+    "b": "blot_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond0_GFP.jpg",
+    "b": "fluorescence_cond0_RFP.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "same_base",
+    "a": "histology_cond1_1.jpg",
+    "b": "histology_cond1_1_rep.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "renamed",
+    "a": "gel_cond2_1.jpg",
+    "b": "gel_cond2_2.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "same_base",
+    "a": "barplot_cond3_1.jpg",
+    "b": "barplot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "channel_alias",
+    "a": "scatter_cond4_GFP.jpg",
+    "b": "scatter_cond4_RFP.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "channel_alias",
+    "a": "gel_cond3_GFP.jpg",
+    "b": "gel_cond3_RFP.jpg"
+   },
+   {
+    "transform": "noise",
+    "naming": "same_base",
+    "a": "blot_cond1_1.jpg",
+    "b": "blot_cond1_1_rep.jpg"
+   },
+   {
+    "transform": "scale075",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond2_GFP.jpg",
+    "b": "fluorescence_cond2_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "renamed",
+    "a": "gel_cond4_1.jpg",
+    "b": "gel_cond4_2.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "same_base",
+    "a": "barplot_cond0_1.jpg",
+    "b": "barplot_cond0_1_rep.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "channel_alias",
+    "a": "scatter_cond1_GFP.jpg",
+    "b": "scatter_cond1_RFP.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "same_base",
+    "a": "blot_cond2_1.jpg",
+    "b": "blot_cond2_1_rep.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "renamed",
+    "a": "fluorescence_cond3_1.jpg",
+    "b": "fluorescence_cond3_2.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "same_base",
+    "a": "histology_cond4_1.jpg",
+    "b": "histology_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "same_base",
+    "a": "blot_cond3_1.jpg",
+    "b": "blot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "contrast",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond4_GFP.jpg",
+    "b": "fluorescence_cond4_RFP.jpg"
+   },
+   {
+    "transform": "noise",
+    "naming": "renamed",
+    "a": "gel_cond1_1.jpg",
+    "b": "gel_cond1_2.jpg"
+   },
+   {
+    "transform": "scale150",
+    "naming": "channel_alias",
+    "a": "scatter_cond3_GFP.jpg",
+    "b": "scatter_cond3_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "same_base",
+    "a": "blot_cond4_1.jpg",
+    "b": "blot_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "renamed",
+    "a": "fluorescence_cond0_1.jpg",
+    "b": "fluorescence_cond0_2.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "same_base",
+    "a": "histology_cond1_1.jpg",
+    "b": "histology_cond1_1_rep.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "channel_alias",
+    "a": "gel_cond2_GFP.jpg",
+    "b": "gel_cond2_RFP.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "same_base",
+    "a": "barplot_cond3_1.jpg",
+    "b": "barplot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "renamed",
+    "a": "scatter_cond4_1.jpg",
+    "b": "scatter_cond4_2.jpg"
+   },
+   {
+    "transform": "recompress",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond1_GFP.jpg",
+    "b": "fluorescence_cond1_RFP.jpg"
+   },
+   {
+    "transform": "jpeg55",
+    "naming": "same_base",
+    "a": "histology_cond2_1.jpg",
+    "b": "histology_cond2_1_rep.jpg"
+   },
+   {
+    "transform": "gamma",
+    "naming": "channel_alias",
+    "a": "scatter_cond0_GFP.jpg",
+    "b": "scatter_cond0_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "channel_alias",
+    "a": "gel_cond4_GFP.jpg",
+    "b": "gel_cond4_RFP.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "same_base",
+    "a": "barplot_cond0_1.jpg",
+    "b": "barplot_cond0_1_rep.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "renamed",
+    "a": "scatter_cond1_1.jpg",
+    "b": "scatter_cond1_2.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "same_base",
+    "a": "blot_cond2_1.jpg",
+    "b": "blot_cond2_1_rep.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond3_GFP.jpg",
+    "b": "fluorescence_cond3_RFP.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "same_base",
+    "a": "histology_cond4_1.jpg",
+    "b": "histology_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "jpeg55",
+    "naming": "channel_alias",
+    "a": "scatter_cond2_GFP.jpg",
+    "b": "scatter_cond2_RFP.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "same_base",
+    "a": "blot_cond3_1.jpg",
+    "b": "blot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "noise",
+    "naming": "channel_alias",
+    "a": "gel_cond1_GFP.jpg",
+    "b": "gel_cond1_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "same_base",
+    "a": "blot_cond4_1.jpg",
+    "b": "blot_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond0_GFP.jpg",
+    "b": "fluorescence_cond0_RFP.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "same_base",
+    "a": "histology_cond1_1.jpg",
+    "b": "histology_cond1_1_rep.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "renamed",
+    "a": "gel_cond2_1.jpg",
+    "b": "gel_cond2_2.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "same_base",
+    "a": "barplot_cond3_1.jpg",
+    "b": "barplot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "channel_alias",
+    "a": "scatter_cond4_GFP.jpg",
+    "b": "scatter_cond4_RFP.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "channel_alias",
+    "a": "gel_cond3_GFP.jpg",
+    "b": "gel_cond3_RFP.jpg"
+   },
+   {
+    "transform": "scale075",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond2_GFP.jpg",
+    "b": "fluorescence_cond2_RFP.jpg"
+   },
+   {
+    "transform": "crop80",
+    "naming": "renamed",
+    "a": "gel_cond4_1.jpg",
+    "b": "gel_cond4_2.jpg"
+   },
+   {
+    "transform": "crop60",
+    "naming": "same_base",
+    "a": "barplot_cond0_1.jpg",
+    "b": "barplot_cond0_1_rep.jpg"
+   },
+   {
+    "transform": "rot180",
+    "naming": "channel_alias",
+    "a": "scatter_cond1_GFP.jpg",
+    "b": "scatter_cond1_RFP.jpg"
+   },
+   {
+    "transform": "rot90",
+    "naming": "same_base",
+    "a": "blot_cond2_1.jpg",
+    "b": "blot_cond2_1_rep.jpg"
+   },
+   {
+    "transform": "flipH",
+    "naming": "renamed",
+    "a": "fluorescence_cond3_1.jpg",
+    "b": "fluorescence_cond3_2.jpg"
+   },
+   {
+    "transform": "flipV",
+    "naming": "same_base",
+    "a": "histology_cond4_1.jpg",
+    "b": "histology_cond4_1_rep.jpg"
+   },
+   {
+    "transform": "brightness",
+    "naming": "same_base",
+    "a": "blot_cond3_1.jpg",
+    "b": "blot_cond3_1_rep.jpg"
+   },
+   {
+    "transform": "contrast",
+    "naming": "channel_alias",
+    "a": "fluorescence_cond4_GFP.jpg",
+    "b": "fluorescence_cond4_RFP.jpg"
+   }
+  ],
+  "false_positives": [
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_040/barplot_cond0_6.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_034/barplot_cond4_1_rep.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_142/barplot_cond2_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_190/barplot_cond0_5.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_046/barplot_cond1_5.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_028/barplot_cond3_1.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_166/barplot_cond1_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_106/barplot_cond1_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_196/barplot_cond1_6.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_178/barplot_cond3_6.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_160/barplot_cond0_4.jpg"
+   ],
+   [
+    "cross/case_004/barplot_cond4_1.jpg",
+    "cross/case_010/barplot_cond0_1_rep.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_178/barplot_cond3_1.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_154/barplot_cond4_5.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_028/barplot_cond3_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_196/barplot_cond1_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_046/barplot_cond1_6.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_154/barplot_cond4_1.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_088/barplot_cond3_5.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_154/barplot_cond4_3.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_196/barplot_cond1_1_rep.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_118/barplot_cond3_3.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_064/barplot_cond4_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_118/barplot_cond3_1_rep.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_016/barplot_cond1_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_148/barplot_cond3_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_088/barplot_cond3_6.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_184/barplot_cond4_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_160/barplot_cond0_1.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_016/barplot_cond1_1_rep.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_010/barplot_cond0_5.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_112/barplot_cond2_4.jpg"
+   ],
+   [
+    "cross/case_004/barplot_cond4_1_rep.jpg",
+    "cross/case_010/barplot_cond0_1_rep.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_196/barplot_cond1_1.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_034/barplot_cond4_1.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_082/barplot_cond2_3.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_130/barplot_cond0_3.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_154/barplot_cond4_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_172/barplot_cond2_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_058/barplot_cond3_1.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_148/barplot_cond3_1.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_124/barplot_cond4_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_148/barplot_cond3_6.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_052/barplot_cond2_6.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_046/barplot_cond1_3.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_178/barplot_cond3_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_016/barplot_cond1_3.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_118/barplot_cond3_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_160/barplot_cond0_5.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_028/barplot_cond3_3.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_076/barplot_cond1_6.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_166/barplot_cond1_5.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_100/barplot_cond0_5.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_160/barplot_cond0_3.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_172/barplot_cond2_6.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_082/barplot_cond2_6.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_016/barplot_cond1_1.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_082/barplot_cond2_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_022/barplot_cond2_4.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_094/barplot_cond4_5.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_142/barplot_cond2_5.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_112/barplot_cond2_5.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_154/barplot_cond4_1_rep.jpg"
+   ],
+   [
+    "cross/case_010/barplot_cond0_1_rep.jpg",
+    "cross/case_142/barplot_cond2_1.jpg"
+   ]
+  ]
+ },
+ "intra": {
+  "region": {
+   "tp": 0,
+   "fp": 0,
+   "fn": 0,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0
+  },
+  "figure": {
+   "tp": 0,
+   "fp": 0,
+   "fn": 0,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0
+  },
+  "mean_iou": 0.0,
+  "median_center_err_px": null,
+  "by_relation": {},
+  "capability": false
+ }
+}

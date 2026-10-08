@@ -1,174 +1,132 @@
-# 🔬 科研图片查重工具
+# 🔬 科研图片查重工具 v3
 
-一个用于检测科研论文中图片重复/造假的工具，支持多种检测算法。
+用于检测科研论文中图片重复/复用的工具。**v3 的核心新增能力是检查同一张组图内部
+panel 之间的重叠、复用与复制粘贴** —— 这正是 SCI 组图投稿中最容易被忽略、
+也最常出问题的一类。
+
+> 与 v2 的完整对比（含实测数据）见 **[COMPARISON.md](COMPARISON.md)**。
+> 旧版保留在 `legacy/`，可直接对照运行。
+
+---
 
 ## 快速开始
 
-### 方法一：双击运行（最简单）⭐
+### 方法一：双击运行 ⭐
 
-1. **首次使用**：双击 `图片查重工具.bat`
-   - 自动检查并安装依赖
-   - 自动扫描当前目录的所有图片
-   - 自动打开HTML报告
+双击 `图片查重工具.bat` —— 自动检查依赖、扫描当前目录、生成并打开交互式报告。
 
-2. **后续使用**：直接双击 `图片查重工具.bat`
-
-### 方法二：打包成EXE（推荐分发）
+### 方法二：命令行
 
 ```bash
-python build_exe.py
+# 同时做「跨文件查重」和「图内 panel 复用检测」（默认）
+python image_dedup_v3.py D:\my_paper_figures
+
+# 只查同一张组图内部的 panel 复用
+python image_dedup_v3.py D:\my_paper_figures --mode intra
+
+# 只查不同文件之间的重复
+python image_dedup_v3.py D:\my_paper_figures --mode cross
+
+# 指定报告 / JSON 输出
+python image_dedup_v3.py D:\figs --report out.html --json out.json
 ```
 
-打包完成后，`dist/图片查重工具.exe` 可以：
-- 复制到任何包含图片的目录
-- 双击直接运行，无需Python环境
-- 分发给其他人使用
+---
 
-### 方法三：命令行运行（推荐用优化版）
+## 两类检测任务
 
-```bash
-# 扫描当前目录
-python image_dedup.py
+| | 跨文件查重 `--mode cross` | 图内复用检测 `--mode intra` |
+|---|---|---|
+| 回答的问题 | 同一张图是否在多个文件里重复出现 | 同一张组图里，两个 panel 是否同源 |
+| 典型场景 | 一图多用、换名重复投稿 | 组图拼接时误用同一张源图、panel 局部重叠、图内复制粘贴 |
+| 方法 | 多变换感知哈希索引 + 结构检测器投票 | 组图 XY-cut 切分 + SIFT 自匹配 + 迭代 RANSAC + NCC 验证 |
+| 输出 | 文件对 + 相似度 + 置信度 | **区域坐标对** + 变换类型 + 区域归属 panel |
 
-# 扫描指定目录（优化版，速度更快、误报更低）
-python image_dedup_optimized.py D:\photos
+### 能识别的变换
 
-# 调整参数
-python image_dedup_optimized.py D:\photos --min-confidence 0.7 --min-votes 3
+精确复制、JPEG 重压缩、亮度/对比度/gamma 调整、加噪、缩放、裁剪、
+**旋转 90°/180°、水平/垂直镜像**、panel 部分重叠、panel 内复制粘贴。
 
-# 查看帮助
-python image_dedup_optimized.py --help
-```
+---
 
-## 优化版（image_dedup_optimized.py）
+## 交互式报告
 
-在 `image_dedup.py` 基础上做了三方面增强，**推荐使用**：
+运行后生成自包含的 `report.html`（图片内嵌，无外部依赖，双击即可离线打开）：
 
-### 1. 降低误报率
-- **窗口化 SSIM（内容加权）**：替代全局标量SSIM。科研图大片背景相似但内容不同的两张图，
-  旧算法 SSIM 会虚高到 0.9+（实测0.96），现在按局部方差加权，仅内容区域主导分数
-- **低信息量图过滤**：空白/纯色图（灰度std过低）只走MD5精确匹配，消除
-  "两张任意空白图互报 critical" 的经典误报
-- **投票去相关**：pHash/dHash 同源高度相关、直方图纯统计信号，三者互不独立。
-  现改为 pHash/dHash/SSIM 三个结构类检测器投票（`--min-votes`），直方图降为参考票
-- **亮度归一化SSIM**：专捕"同结构不同曝光"（亮度/对比度/曝光调整）的副本，实测区分度 ~1.0 vs <0
-- **ORB二次确认**：恰好最低票数通过的边缘候选对，用ORB特征匹配独立复核，
-  确认失败默认降级（`--orb-strict` 直接剔除）
-- **旋转检测重写**：原 whash-64bit 对深色稀疏条带图无区分度（真实旋转与随机图对
-  差异区间重叠，误报极高）；改用变换后 phash-256bit 比较（真旋转≤10、随机对≥90，
-  阈值24两侧余量充足），并用**等比缩放画布**修复非方形图旋转比较失真的问题
+- **SVG 覆盖层标注**：A 区（蓝实线）/ B 区（橙虚线）/ 自动切分出的 panel 边界（灰点线），
+  缩放时框线保持锐利
+- **滚轮缩放 + 拖拽平移**：可直接放大到原始分辨率查看细节
+- **原始分辨率裁剪对照**：A/B 两处内容并排显示
+- **闪烁对比**：同一位置交替显示 A/B 内容 —— 同源时几乎看不出切换，是最直观的判据
+- 按文件名搜索、按严重程度过滤
 
-### 2. 补回漏掉的检测能力
-- **子图/裁剪检测（快速版）**：原版 O(w·h·scale) 滑动窗口慢到不可用被删除；
-  现用"面积比过滤 + 降采样 + 多尺度 matchTemplate"，毫秒级，条带复用类造假可检出
-- **旋转/翻转增强召回**：旋转副本哈希差异巨大、进不了普通索引，旋转检测形同虚设；
-  现为每张图额外索引 5 种几何变换哈希，旋转副本重新可召回
-
-### 3. 交互性能
-- 目录单次遍历（原实现按扩展名重复遍历 32 次）、MD5 分块流式、超大图（SVS/NDPI）
-  draft 无损降采样解码，防内存爆炸
-- 缩略图按图片路径缓存 + 并行生成（原实现每对重复生成、串行）
-- HTML 报告新增：文件名搜索、分页（50/100/200条）、"出现N次"badge（同一张图
-  出现在多对里时提示优先审查）、Esc 关闭全屏
-- 新增 `--min-confidence`（置信度过滤）、`--no-thumbnails`（大报告加速）、
-  JSON 报告输出（`--report x.json`，便于二次处理）
-
-```bash
-python image_dedup_optimized.py D:\photos --no-thumbnails --report result.json
-python image_dedup_optimized.py D:\photos --min-confidence 0.8 --no-rotation
-```
-
-## 检测功能
-
-| 检测类型 | 说明 | 严重程度 |
-|---------|------|---------|
-| 完全相同 | MD5哈希完全一致 | 🔴 严重 |
-| 感知哈希相似(pHash) | 微小修改、亮度调整 | 🔴 严重 / 🟠 高 |
-| 差异哈希相似(dHash) | 渐变、边缘变化 | 🔴 严重 / 🟠 高 |
-| 结构相似(SSIM) | 整体结构相似 | 🔴 严重 / 🟠 高 |
-| 直方图相似 | 曝光/亮度调整 | 🟠 高 / 🟡 中 |
-| 疑似旋转/翻转 | 90°/180°/270°旋转、水平/垂直翻转 | 🔴 严重 |
-| 疑似缩放 | 分辨率调整 | 🟠 高 |
-| 疑似子图/裁剪 | 局部截取 | 🔴 严重 |
-| 边缘重叠/拼接 | 拼接造假 | 🟠 高 |
-| 亮度/对比度调整 | 明暗变化 | 🟠 高 |
-| 内部区域复制 | 同一图片内复制粘贴 | 🔴 严重 |
-
-## 输出结果
-
-运行后会在目录下生成：
-
-```
-your_directory/
-├── visualization/          # 可视化对比图目录
-│   ├── 001_CRI_100pct_MOUSE1_vs_MOUSE2.jpg
-│   ├── 002_HIG_95pct_MOUSE1_vs_MOUSE3.jpg
-│   └── ...
-├── report.html             # HTML报告（推荐，浏览器打开）
-├── report.csv              # CSV报告（可用Excel打开）
-└── image_dedup_report_*.html  # 带时间戳的报告备份
-```
-
-## 可视化图说明
-
-可视化图中：
-- **红色框**：标出疑似重复的部位
-- **绿色框**：仅在「内部区域复制」检测中出现，标示同一张图内被复制的第二个区域
+---
 
 ## 命令行参数
 
 | 参数 | 说明 | 默认值 |
-|-----|------|-------|
+|---|---|---|
 | `directory` | 要扫描的目录 | 当前目录 |
-| `--threshold N` | 哈希差异阈值（越小越严格） | 5 |
-| `--ssim-threshold F` | SSIM阈值（越大越严格） | 0.85 |
-| `--hist-threshold F` | 直方图阈值 | 0.80 |
-| `--workers N` | 并行工作进程数 | 4 |
-| `--report PATH` | 报告输出路径 | 自动生成 |
-| `--no-rotation` | 跳过旋转/翻转检测 | - |
-| `--no-subimage` | 跳过子图/裁剪检测 | - |
-| `--no-edge` | 跳过边缘重叠检测 | - |
-| `--no-internal` | 跳过内部区域复制检测 | - |
-| `--hash-size N` | 哈希大小（越大越精确但越慢） | 16 |
+| `--mode` | `cross` / `intra` / `both` | `both` |
+| `--report PATH` | HTML 报告输出路径 | `<目录>/image_dedup_v3_report.html` |
+| `--json PATH` | JSON 结果输出路径 | 不输出 |
+| `--workers N` | 并行线程数 | CPU 核数（上限 16） |
+| `--hash-threshold N` | pHash 差异阈值（256 位），越小越严格 | 12 |
+| `--min-votes N` | 跨文件：至少几种结构检测器通过 | 2 |
+| `--min-inliers N` | 图内：RANSAC 最少内点数 | 14 |
+| `--ncc-threshold F` | 图内：归一化互相关验证阈值 | 0.55 |
+| `--no-thumbnails` | 报告不内嵌图片（文件更小） | - |
 
-## 使用示例
+---
+
+## 性能
+
+| 规模 | v2 总耗时 | v3 总耗时 | v2 峰值内存 | v3 峰值内存 |
+|---|---|---|---|---|
+| 120 张 | 6.8 s | **4.5 s** | 265 MB | **79.6 MB** |
+| 1200 张 | 24.2 s | **3.2 s** | 410 MB | **85.5 MB** |
+
+检测阶段（不含载入）在 1200 张时从 14.07 s 降到 **0.98 s**（14×）。
+加速来自把「逐对 Python 调用」改成「numpy 分块矩阵运算」，而非换语言；
+评估过程见 COMPARISON.md 第 4 节。
+
+---
+
+## 基准测试
 
 ```bash
-# 严格模式（检测更多细节）
-python image_dedup.py --threshold 3
-
-# 宽松模式（减少误报）
-python image_dedup.py --threshold 8
-
-# 只检测完全相同和高度相似
-python image_dedup.py --threshold 2 --ssim-threshold 0.95
-
-# 快速模式（跳过耗时的检测）
-python image_dedup.py --no-rotation --no-subimage --no-internal
-
-# 输出到指定文件
-python image_dedup.py --report result.html
+python bench/gen_dataset.py --out bench/data --clean          # 生成带真值的数据集
+python bench/run_bench.py --detector v3 --out bench/results/v3.json
+python bench/show_result.py bench/results/v3.json             # 看明细
+python bench/compare.py --results <旧.json> <新.json>          # 多维对比表
 ```
 
-## 支持的图片格式
+数据集的每个 case 都注入了**已知的**变换类型与**精确的区域坐标**，
+因此既能算准确率/召回，也能算定位 IoU。
 
-- JPEG (.jpg, .jpeg)
-- PNG (.png)
-- BMP (.bmp)
-- TIFF (.tif, .tiff)
-- GIF (.gif)
-- WebP (.webp)
-- 科研格式 (.svs, .ndpi, .vsi)
+---
 
 ## 环境要求
 
 - Python 3.8+
-- 依赖包：见 `requirements.txt`
+- `pip install -r requirements.txt`（opencv-python / numpy / Pillow）
 
-## 安装依赖
+## 支持的图片格式
 
-```bash
-pip install -r requirements.txt
+JPEG、PNG、BMP、TIFF、GIF、WebP，以及科研格式 `.svs` / `.ndpi` / `.vsi`。
+
+## 目录结构
+
+```
+image_dedup_v3.py        # 入口
+dedup/
+  crossfile.py           # 跨文件查重（向量化哈希 + 投票）
+  features.py            # 图内区域匹配核心（SIFT + 迭代 RANSAC + 验证）
+  panels.py              # 组图 panel 切分（递归 XY-cut）
+  report.py              # 交互式 HTML 报告
+  cli.py                 # 命令行
+bench/                   # 基准数据集生成 / 评测 / 对比
+legacy/v1, legacy/v2     # 旧版备份（可直接运行对照）
 ```
 
 ## 许可证
@@ -177,4 +135,5 @@ MIT License
 
 ## 致谢
 
-- 优化技术参考: [xImageDuplicateChecker](https://github.com/ayumilove/xImageDuplicateChecker) (MIT License)
+- 优化思路参考 [xImageDuplicateChecker](https://github.com/ayumilove/xImageDuplicateChecker) (MIT)
+- 图内复制检测方法参考 Amerini 等 *A SIFT-based forensic method for copy-move attack detection*

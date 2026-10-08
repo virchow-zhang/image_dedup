@@ -1,4 +1,7 @@
+# v3 运行依赖
 Pillow>=9.0.0
-imagehash>=1.3.0
 numpy>=1.21.0
 opencv-python>=4.5.0
+
+# 仅旧版 (legacy/v1, legacy/v2) 需要
+imagehash>=1.3.0
