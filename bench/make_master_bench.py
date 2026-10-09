@@ -100,7 +100,10 @@ def main():
             for t in TRANSFORMS:
                 tf = f'{t}_{idx}.png'
                 if tf in manifest['files']:
-                    ignore.append(sorted([f'cross/all/{t}', f'cross/all/{sp}']))
+                    # 注意用 tf（带序号），写成 t 会得到 'cross/all/contrast_150'
+                    # 这种不存在的路径，ignore 全部失效，约 330 个同基底对
+                    # 会被误记成误报
+                    ignore.append(sorted([f'cross/all/{tf}', f'cross/all/{sp}']))
 
     # 3) 落盘成 main 线基准格式
     dstdir = out / 'cross' / 'all'

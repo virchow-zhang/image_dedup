@@ -21,6 +21,7 @@
 """
 
 import hashlib
+import threading
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
@@ -32,7 +33,8 @@ import numpy as np
 
 from .bow import bow_candidates, compute_bow_keys
 from .edge_overlap import check_edge_overlap
-from .subimage import SubimageCache, check_subimage_arrays, subimage_candidate_pairs
+from .subimage import (SubimageCache, check_subimage_arrays, read_gray_capped,
+                        subimage_candidate_pairs)
 
 IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.bmp', '.tif', '.tiff',
                     '.gif', '.webp', '.svs', '.ndpi', '.vsi'}
@@ -66,7 +68,7 @@ class ImageRecord:
     dhash: np.ndarray
     geom_hash: Dict[str, np.ndarray] = field(default_factory=dict)
     sub_hash: Optional[np.ndarray] = None   # (K, words) 若干子窗口的 pHash
-    bow_keys: Optional[Set[int]] = None     # ORB 词袋键
+    bow_keys: Optional[np.ndarray] = None    # ORB 词袋键（uint32 去重数组）
     hist: Optional[np.ndarray] = None
     gray_small: Optional[np.ndarray] = None
 
@@ -171,7 +173,7 @@ def _load_gray(path: str, max_dim: int = 512) -> Optional[np.ndarray]:
 
 
 def load_record(path: str, hash_size: int = 16,
-                compute_bow: bool = False) -> Optional[ImageRecord]:
+                compute_bow: bool = True) -> Optional[ImageRecord]:
     gray = _load_gray(path)
     if gray is None or gray.size == 0:
         return None
@@ -222,7 +224,7 @@ def load_record(path: str, hash_size: int = 16,
 
 
 def scan_directory(root: str, workers: int = 8, hash_size: int = 16,
-                   compute_bow: bool = False) -> List[ImageRecord]:
+                   compute_bow: bool = True) -> List[ImageRecord]:
     root_p = Path(root)
     paths = []
     seen = set()
@@ -512,6 +514,66 @@ def verify_pair(r1: ImageRecord, r2: ImageRecord,
         same_channel_base=same, vote_details='+'.join(names))
 
 
+def _feature_verify(records, pending, min_inliers: float, ncc: float,
+                    max_features: int, workers: int, verbose: bool):
+    """
+    对「哈希投票没通过」的候选做特征级判定（SIFT 匹配 + RANSAC + 纹理 NCC + 退化检测）。
+
+    这是召回「变换的叠加」（裁剪∘旋转、镜像∘任意角旋转）的唯一途径：
+    这类副本的整图哈希距离远超任何可用阈值（crop_60 实测 118/256），
+    但其中含可匹配的局部结构，SIFT 能找出来。
+
+    特征按路径缓存 —— 不缓存时每对候选都要重跑两次 SIFT，
+    这是把秒级拖成分钟级的元凶。判定并行跑（OpenCV 会释放 GIL）。
+    """
+    from collections import OrderedDict
+    from concurrent.futures import ThreadPoolExecutor
+    from .features import extract_pair_features, match_features
+
+    # 特征缓存必须**有上限**：单张图的 desc 是 Nx128 float32（N=3000 时约 1.5MB），
+    # 连同灰度图与纹理掩膜约 2.7MB。无上限地缓存所有出现过的图，
+    # 1200 张规模就能把常驻内存顶到 GB 级。这里用 FIFO 淘汰。
+    cache: "OrderedDict[str, object]" = OrderedDict()
+    cache_cap = 512                      # 常规规模下等同不淘汰；超大目录才兜底
+    lock = threading.Lock()
+
+    def _feat(path):
+        with lock:
+            if path in cache:
+                cache.move_to_end(path)
+                return cache[path]
+        g = read_gray_capped(path, 1024)
+        f = extract_pair_features(g, max_features) if g is not None else None
+        with lock:
+            cache[path] = f
+            while len(cache) > cache_cap:
+                cache.popitem(last=False)
+        return f
+
+    def _one(pair):
+        i, j = pair
+        try:
+            fa, fb = _feat(records[i].path), _feat(records[j].path)
+            if fa is None or fb is None:
+                return None
+            ms = match_features(fa, fb, min_inliers=int(min_inliers),
+                                ncc_threshold=ncc)
+            return (pair, ms)
+        except Exception:
+            return None
+
+    out = []
+    if not pending:
+        return out
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        for res in ex.map(_one, pending):
+            if res and res[1]:
+                out.append(res)
+    if verbose:
+        print(f'  特征级判定: {len(pending)} 对 → 命中 {len(out)}')
+    return out
+
+
 def find_cross_duplicates(records: Sequence[ImageRecord],
                           phash_threshold: int = 12,
                           min_votes: int = 2,
@@ -522,24 +584,28 @@ def find_cross_duplicates(records: Sequence[ImageRecord],
                           edge_threshold: float = 0.55,
                           max_subimage_pairs: int = 4000,
                           candidate_threshold: int = 0,
-                          use_bow: bool = False,
-                          bow_min_shared: int = 8) -> List[CrossMatch]:
+                          use_bow: bool = True,
+                          bow_min_shared: int = 8,
+                          detect_features: bool = True,
+                          max_feature_pairs: int = 8000,
+                          feature_min_inliers: int = 80,
+                          feature_ncc: float = 0.60,
+                          feature_max_features: int = 1000,
+                          workers: int = 8) -> List[CrossMatch]:
     """
     candidate_threshold: 候选生成的 pHash 距离上限（0 = 用 phash_threshold*2）。
     单独暴露出来是因为**候选层与判定层的最优阈值不同**：
     任意角度旋转副本的哈希距离实测约 36/256（见 COMPARISON.md），
-    按 24 卡会整类漏掉；而判定层有投票+NCC+退化检测兜底，
-    放宽候选不会同比例放大误报。
+    按 24 卡会整类漏掉。
 
-    use_bow: ORB 词袋候选层，**默认关闭**。
-    移植自 master 线后实测**没有产生收益**：master 基准上召回仍是 0.655
-    （23/92 种变换组合依旧 0 召回），而 1200 张基准上精确率 1.000→0.823
-    （41 个误报）、检测耗时 2.46s→56.4s。
-    原因：BOW 只是把候选放进来了，但这些「组合变换」候选（裁剪∘旋转等）
-    在判定层被整图结构投票（pHash/dHash/SSIM）否决 ——
-    master 的召回优势其实来自它**判定层**接受「部分证据」
-    （逐对 SIFT + 覆盖率判据 + 边缘重叠 + 子图），而不是候选索引。
-    只移植候选层无法复现该收益。代码保留，供将来重做判定层时启用。
+    use_bow: ORB 词袋候选层。早期把它单独打开时毫无收益（召回没涨、误报暴涨），
+    因为那些候选在判定层被整图结构投票否决。现在判定层有了特征级验证
+    （detect_features），BOW 才有了意义：它负责**把组合变换的候选挖出来**，
+    特征级验证负责**判定**。
+
+    detect_features: 对投票未通过的候选做 SIFT+RANSAC+纹理NCC 判定。
+    这是覆盖「变换的叠加」（裁剪∘旋转、镜像∘任意角旋转）的唯一途径 ——
+    这类副本整图哈希距离 118/256（crop_60），任何阈值都够不着。
     """
     if candidate_threshold <= 0:
         candidate_threshold = max(phash_threshold * 2, 40)
@@ -575,21 +641,28 @@ def find_cross_duplicates(records: Sequence[ImageRecord],
     #     ORB 描述子天生抗旋转/缩放，用来补这一类。
     bow_cand = {}
     if use_bow and n >= 2:
-        bow_cand = bow_candidates([r.bow_keys or set() for r in records],
+        bow_cand = bow_candidates([r.bow_keys for r in records],
                                   min_shared=bow_min_shared)
         bow_cand = {k: v for k, v in bow_cand.items() if k not in exact_pairs}
         if verbose:
             print(f'  ORB 词袋候选: {len(bow_cand)} 对 (共享词 >= {bow_min_shared})')
 
-    # 3) 投票验证 + 边缘拼接
+    # 3) 投票验证 + 边缘拼接；未通过的候选留到第 3b 步做特征级判定
     reported = set(exact_pairs)
-    for (i, j) in sorted(set(cand) | set(bow_cand)):
+    pending = []
+    # 注意 BOW 独有的候选**不走整图投票**：BOW 存在的意义就是「变换的叠加」，
+    # 而这类副本本就不满足整图一致性。更要紧的是——两张不同的柱状图因为
+    # 大片白底，SSIM/pHash 也会互相通过投票（实测 2 个误报全部来自这里）。
+    # BOW 候选一律交给特征级判定，其内点分离度大得多（真同源 >=135，误报 <=38）。
+    hash_pairs = set(cand)
+    for (i, j) in sorted(hash_pairs):
         m = verify_pair(records[i], records[j],
                         pthresh=phash_threshold, min_votes=min_votes)
         if m:
             matches.append(m)
             reported.add((i, j))
             continue
+        pending.append((i, j))
         if detect_edge:
             eo = check_edge_overlap(records[i].gray_small, records[j].gray_small,
                                     edge_threshold)
@@ -601,6 +674,40 @@ def find_cross_duplicates(records: Sequence[ImageRecord],
                     similarity=round(score, 4), match_type=f'疑似{direction}边缘重叠/拼接',
                     details=detail, confidence=round(score, 4),
                     vote_details='edge'))
+                reported.add((i, j))
+
+    pending.extend(sorted(set(bow_cand) - hash_pairs))
+
+    # 3b) 特征级判定：整图结构不一致、但含同源局部（变换叠加）才走得通
+    if detect_features and pending:
+        # 按哈希/共享词证据强弱排序后再截断，避免上限截掉最可能的那些
+        def _rank(p):
+            return (cand.get(p, 999), -bow_cand.get(p, 0))
+        pending.sort(key=_rank)
+        if len(pending) > max_feature_pairs:
+            if verbose:
+                print(f'  特征级候选 {len(pending)} 对，按证据强度取前 {max_feature_pairs}')
+            pending = pending[:max_feature_pairs]
+        # 截断后按图像下标重排：让相邻的候选对共享同一张图，
+        # 特征缓存命中率大幅提高（否则小缓存会反复淘汰重算，
+        # 实测 1200 张下检测耗时从 18s 涨到 98s）。
+        pending.sort(key=lambda p: (p[0], p[1]))
+
+        for (i, j), ms in _feature_verify(records, pending, feature_min_inliers,
+                                          feature_ncc, feature_max_features,
+                                          workers, verbose):
+            if (i, j) in reported:
+                continue
+            best = max(ms, key=lambda r: r.score)
+            reported.add((i, j))
+            matches.append(CrossMatch(
+                image1=records[i].path, image2=records[j].path,
+                severity='high' if best.n_inliers >= 40 else 'medium',
+                similarity=round(best.ncc, 4),
+                match_type=f'特征匹配（{best.transform}）',
+                details=(f'RANSAC 内点 {best.n_inliers}，纹理掩膜 NCC {best.ncc:.3f}，'
+                         f'匹配区域占比 {best.meta.get("coverage", 0):.2f}'),
+                confidence=round(best.score, 4), vote_details='feature'))
 
     # 4) 子图 / 裁剪（整图哈希的天然盲区，需要模板匹配单独兜）
     #    候选用子窗口哈希生成（O(n)），不再按面积比枚举（O(n²)，1200 张图会

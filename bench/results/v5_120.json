@@ -1,0 +1,214 @@
+{
+ "detector": "v4",
+ "label": "v5f_120",
+ "data": "D:\\Github\\image_dedup\\bench\\data",
+ "wall_s": 6.5,
+ "timings": {
+  "load_s": 0.94,
+  "detect_s": 1.31,
+  "intra_s": 4.17,
+  "total_s": 6.42
+ },
+ "memory": {
+  "rss_start_mb": 48.3,
+  "rss_peak_mb": 251.6
+ },
+ "n_images": 120,
+ "error": null,
+ "cross": {
+  "overall": {
+   "tp": 23,
+   "fp": 0,
+   "fn": 1,
+   "precision": 1.0,
+   "recall": 0.9583,
+   "f1": 0.9787
+  },
+  "by_transform": {
+   "brightness": {
+    "hit": 1,
+    "total": 2,
+    "recall": 0.5
+   },
+   "contrast": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "crop60": {
+    "hit": 1,
+    "total": 1,
+    "recall": 1.0
+   },
+   "crop80": {
+    "hit": 1,
+    "total": 1,
+    "recall": 1.0
+   },
+   "exact": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "flipH": {
+    "hit": 1,
+    "total": 1,
+    "recall": 1.0
+   },
+   "flipV": {
+    "hit": 1,
+    "total": 1,
+    "recall": 1.0
+   },
+   "gamma": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "jpeg55": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "noise": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "recompress": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "rot180": {
+    "hit": 1,
+    "total": 1,
+    "recall": 1.0
+   },
+   "rot90": {
+    "hit": 1,
+    "total": 1,
+    "recall": 1.0
+   },
+   "scale075": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   },
+   "scale150": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0
+   }
+  },
+  "by_naming": {
+   "channel_alias": {
+    "hit": 6,
+    "total": 6,
+    "recall": 1.0
+   },
+   "renamed": {
+    "hit": 6,
+    "total": 6,
+    "recall": 1.0
+   },
+   "same_base": {
+    "hit": 11,
+    "total": 12,
+    "recall": 0.917
+   }
+  },
+  "missed_positives": [
+   {
+    "transform": "brightness",
+    "naming": "same_base",
+    "a": "blot_cond3_1.jpg",
+    "b": "blot_cond3_1_rep.jpg"
+   }
+  ],
+  "false_positives": []
+ },
+ "intra": {
+  "region": {
+   "tp": 13,
+   "fp": 3,
+   "fn": 7,
+   "precision": 0.8125,
+   "recall": 0.65,
+   "f1": 0.7222
+  },
+  "figure": {
+   "tp": 16,
+   "fp": 0,
+   "fn": 4,
+   "precision": 1.0,
+   "recall": 0.8,
+   "f1": 0.8889
+  },
+  "mean_iou": 0.786,
+  "median_center_err_px": 14.6,
+  "by_relation": {
+   "copymove_within": {
+    "hit": 1,
+    "total": 2,
+    "recall": 0.5,
+    "mean_iou": 0.807
+   },
+   "panel_partial_overlap": {
+    "hit": 1,
+    "total": 2,
+    "recall": 0.5,
+    "mean_iou": 0.795
+   },
+   "panel_reuse_brightness": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0,
+    "mean_iou": 0.719
+   },
+   "panel_reuse_contrast": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0,
+    "mean_iou": 0.892
+   },
+   "panel_reuse_crop": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0,
+    "mean_iou": 0.754
+   },
+   "panel_reuse_exact": {
+    "hit": 1,
+    "total": 2,
+    "recall": 0.5,
+    "mean_iou": 0.877
+   },
+   "panel_reuse_flipH": {
+    "hit": 2,
+    "total": 2,
+    "recall": 1.0,
+    "mean_iou": 0.818
+   },
+   "panel_reuse_recompress": {
+    "hit": 1,
+    "total": 2,
+    "recall": 0.5,
+    "mean_iou": 0.703
+   },
+   "panel_reuse_rot180": {
+    "hit": 0,
+    "total": 2,
+    "recall": 0.0,
+    "mean_iou": 0.0
+   },
+   "panel_reuse_scale075": {
+    "hit": 1,
+    "total": 2,
+    "recall": 0.5,
+    "mean_iou": 0.67
+   }
+  },
+  "capability": true
+ }
+}

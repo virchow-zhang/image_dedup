@@ -143,7 +143,15 @@ def run_v3(data_dir: Path, workers: int = 8, **kw):
     peak.append(proc.memory_info().rss)
 
     t1 = time.perf_counter()
-    matches = find_cross_duplicates(recs, candidate_threshold=int(os.environ.get('DEDUP_CAND_TH', '0')))
+    matches = find_cross_duplicates(
+        recs,
+        candidate_threshold=int(os.environ.get('DEDUP_CAND_TH', '0')),
+        feature_min_inliers=int(os.environ.get('DEDUP_FMIN', '80')),
+        feature_ncc=float(os.environ.get('DEDUP_FNCC', '0.60')),
+        max_feature_pairs=int(os.environ.get('DEDUP_FMAX', '8000')),
+        use_bow=os.environ.get('DEDUP_BOW', '1') == '1',
+        detect_features=os.environ.get('DEDUP_FEAT', '1') == '1',
+        detect_edge=os.environ.get('DEDUP_EDGE', '1') == '1')
     t_detect = time.perf_counter() - t1
     peak.append(proc.memory_info().rss)
 

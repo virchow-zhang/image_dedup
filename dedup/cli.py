@@ -105,6 +105,10 @@ def main(argv=None):
                     help='关闭子图/裁剪检测（金字塔模板匹配）')
     ap.add_argument('--subimage-threshold', type=float, default=0.85,
                     help='子图/裁剪相关系数阈值')
+    ap.add_argument('--no-features', action='store_true',
+                    help='关闭跨图特征级判定（更快更省内存，但漏掉变换叠加类复用）')
+    ap.add_argument('--no-bow', action='store_true',
+                    help='关闭 ORB 词袋候选（它只为特征级判定供候选）')
     ap.add_argument('--no-edge', action='store_true',
                     help='关闭边缘重叠/拼接检测')
     ap.add_argument('--edge-threshold', type=float, default=0.55,
@@ -136,7 +140,10 @@ def main(argv=None):
             detect_subimage=not args.no_subimage,
             subimage_threshold=args.subimage_threshold,
             detect_edge=not args.no_edge,
-            edge_threshold=args.edge_threshold)
+            edge_threshold=args.edge_threshold,
+            detect_features=not args.no_features,
+            use_bow=not args.no_bow,
+            workers=args.workers)
         print(f'[2] 跨文件查重: {len(cross_matches)} 对 '
               f'({time.perf_counter()-t1:.1f}s)')
 

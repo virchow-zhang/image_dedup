@@ -484,22 +484,208 @@ def _degenerate_line(pts: np.ndarray, ratio: float = 0.03) -> bool:
     return float(ev[0]) <= max(float(ev[1]), 1e-6) * ratio
 
 
+# ---------------------------------------------------------------- 跨图配对
+#
+# 下面这套是「判定层」的关键补充。哈希/SSIM 投票要求**整图结构一致**，
+# 因此对「变换的叠加」（裁剪∘旋转、镜像∘任意角旋转）无能为力：
+# 实测 17° 旋转副本的 pHash 距离是 36/256，裁剪60% 是 118/256。
+# SIFT 描述子天生抗旋转与缩放，可以在**只有局部证据**时判定同源。
+#
+# 但纯 SIFT+RANSAC 会大量误报（实测 master 那条线在难负样本上 114 个误报，
+# 其中 88 个跨实验），根因是长直线（散点图趋势线、坐标轴）能让 RANSAC
+# 凑出自洽变换。所以这里叠加三道约束，缺一不可：
+#   1. 退化检测     —— 内点不能退化成一条线
+#   2. 纹理掩膜 NCC —— 只在有结构的像素上比对，留白不算数
+#   3. 区域占比标注 —— 匹配区域远小于整图时归为"局部复用/拼接"
+
+
+def build_pair_sets(gray_a: np.ndarray, gray_b: np.ndarray, max_features: int):
+    """分别构建 A、B 的特征集（含镜像），坐标各自在自己的图像坐标系里。"""
+    return (build_match_set(gray_a, max_features),
+            build_match_set(gray_b, max_features))
+
+
+def ratio_match(pa, da, pb, db, ratio: float = 0.80, knn: int = 2):
+    """A→B 的描述子匹配 + Lowe 比值检验。返回 [(i, j), ...]"""
+    if len(da) < 2 or len(db) < 2:
+        return []
+    try:
+        ms = cv2.BFMatcher().knnMatch(da, db, k=min(knn, len(db)))
+    except cv2.error:
+        return []
+    out = []
+    for m in ms:
+        if len(m) == 2 and m[0].distance < ratio * m[1].distance:
+            out.append((m[0].queryIdx, m[0].trainIdx))
+    return out
+
+
+def _pair_ncc(gray_a: np.ndarray, gray_b: np.ndarray, M: np.ndarray,
+              box: Tuple[int, int, int, int], tex: np.ndarray,
+              min_overlap: int = 300) -> float:
+    """
+    把 B 按 M 映射到 A 的坐标系后，在 box 内与 A 做纹理掩膜 NCC。
+
+    坑：cv2.warpAffine 默认把传入矩阵当**目标→源**，即 dst(p) = src(M⁻¹p)；
+    要得到 dst(p) = src(M·p) 必须显式加 WARP_INVERSE_MAP。
+    这里需要后者 —— M 是 A→B 的变换，只有 warped(p) = gray_b(M·p)
+    才是「A 坐标系里 B 应该长什么样」。
+    漏掉该 flag 时恒等变换恰好也对（所以 exact_copy 能过），
+    而旋转/镜像类会全部 NCC≈0，表面上看非常像"匹配失败"。
+    """
+    ha, wa = gray_a.shape[:2]
+    hb, wb = gray_b.shape[:2]
+    warped = cv2.warpAffine(gray_b, M, (wa, ha),
+                            flags=cv2.INTER_LINEAR | cv2.WARP_INVERSE_MAP,
+                            borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+    valid = cv2.warpAffine(np.ones((hb, wb), np.uint8), M, (wa, ha),
+                           flags=cv2.INTER_NEAREST | cv2.WARP_INVERSE_MAP,
+                           borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+    x, y, bw, bh = box
+    x0, y0 = max(0, x), max(0, y)
+    x1, y1 = min(wa, x + bw), min(ha, y + bh)
+    if x1 - x0 < 4 or y1 - y0 < 4:
+        return 0.0
+    a = gray_a[y0:y1, x0:x1].astype(np.float32)
+    b = warped[y0:y1, x0:x1].astype(np.float32)
+    m = (valid[y0:y1, x0:x1] > 0) & tex[y0:y1, x0:x1]
+    if int(m.sum()) < min_overlap:
+        return 0.0
+    av = a[m] - a[m].mean()
+    bv = b[m] - b[m].mean()
+    denom = float(np.sqrt((av * av).sum() * (bv * bv).sum()))
+    return float((av * bv).sum() / denom) if denom > 1e-6 else 0.0
+
+
+def find_pair_matches(gray_a: np.ndarray, gray_b: np.ndarray,
+                      min_inliers: int = 12,
+                      ncc_threshold: float = 0.60,
+                      min_region: int = 32,
+                      max_features: int = 2000,
+                      detect_max_dim: int = 900,
+                      pad_frac: float = 0.05,
+                      max_models: int = 3,
+                      max_self_overlap: float = 0.30) -> List[RegionMatch]:
+    """
+    判断两张图之间是否存在同源区域（支持裁剪/旋转/缩放/镜像/局部拼接）。
+
+    返回的 RegionMatch：a_bbox 在 gray_a 坐标系，b_bbox 在 gray_b 坐标系。
+    """
+    ha, wa = gray_a.shape[:2]
+    hb, wb = gray_b.shape[:2]
+    sa = min(1.0, detect_max_dim / max(ha, wa))
+    sb = min(1.0, detect_max_dim / max(hb, wb))
+    ga = cv2.resize(gray_a, (max(1, int(wa * sa)), max(1, int(ha * sa))),
+                    interpolation=cv2.INTER_AREA) if sa < 1 else gray_a
+    gb = cv2.resize(gray_b, (max(1, int(wb * sb)), max(1, int(hb * sb))),
+                    interpolation=cv2.INTER_AREA) if sb < 1 else gray_b
+    return match_features(extract_pair_features(ga, max_features),
+                          extract_pair_features(gb, max_features),
+                          min_inliers=min_inliers, ncc_threshold=ncc_threshold,
+                          min_region=min_region, pad_frac=pad_frac,
+                          max_models=max_models, max_self_overlap=max_self_overlap,
+                          scale_a=sa, scale_b=sb)
+
+
+def extract_pair_features(gray: np.ndarray, max_features: int = 1000,
+                          max_dim: int = 900) -> dict:
+    """
+    提取一张图用于跨图配对的特征（含镜像），并缓存纹理掩膜。
+
+    单独抽出来是为了能按路径缓存：不做缓存时每对候选都要重跑两次 SIFT，
+    1200 张规模下这部分会从秒级涨到分钟级。
+    """
+    h, w = gray.shape[:2]
+    s = min(1.0, max_dim / max(h, w))
+    g = cv2.resize(gray, (max(1, int(w * s)), max(1, int(h * s))),
+                   interpolation=cv2.INTER_AREA) if s < 1 else gray
+    coords, desc, _ = build_match_set(g, max_features)
+    return {'gray': g, 'coords': coords, 'desc': desc,
+            'tex': _texture_mask(g), 'shape': g.shape[:2], 'scale': s}
+
+
+def match_features(fa: dict, fb: dict,
+                   min_inliers: int = 12,
+                   ncc_threshold: float = 0.60,
+                   min_region: int = 32,
+                   pad_frac: float = 0.05,
+                   max_models: int = 3,
+                   max_self_overlap: float = 0.30,
+                   scale_a: float = 1.0, scale_b: float = 1.0
+                   ) -> List[RegionMatch]:
+    """已提取特征版本的两图同源判定。bbox 会映射回原始分辨率。"""
+    pa, da = fa['coords'], fa['desc']
+    pb, db = fb['coords'], fb['desc']
+    ga, gb = fa['gray'], fb['gray']
+    if len(pa) < min_inliers or len(pb) < min_inliers:
+        return []
+
+    # coords 把 A、B 的特征拼在一起，pairs 的 src 落在 A 段、dst 落在 B 段，
+    # 这样可以直接复用单图版那套迭代 RANSAC。
+    # 偏移必须是 len(pa)（A 段长度），不是 len(pb)。
+    offset = len(pa)
+    coords = np.vstack([pa, pb])
+    raw = ratio_match(pa, da, pb, db)
+    if len(raw) < min_inliers:
+        return []
+    pairs = [(i, offset + j, 0.0) for i, j in raw]
+
+    tex_a = fa['tex']
+    out: List[RegionMatch] = []
+
+    for M, idx in iterative_ransac(coords, pairs, min_inliers, max_models=max_models):
+        src_pts = np.array([coords[pairs[k][0]] for k in idx], np.float32)
+        dst_pts = np.array([coords[pairs[k][1]] for k in idx], np.float32)
+
+        ax, ay, aw, ah = cv2.boundingRect(src_pts.reshape(-1, 1, 2))
+        bx, by, bw, bh = cv2.boundingRect(dst_pts.reshape(-1, 1, 2))
+        if min(aw, ah, bw, bh) < min_region:
+            continue
+        # 退化检测：长直线（趋势线/坐标轴）能让 RANSAC 凑出自洽变换，
+        # 这是纯 SIFT 方案误报的主因，必须挡掉
+        if _degenerate_line(src_pts) or _degenerate_line(dst_pts):
+            continue
+
+        pax, pay = int(aw * pad_frac), int(ah * pad_frac)
+        pbx, pby = int(bw * pad_frac), int(bh * pad_frac)
+        abox = (max(0, ax - pax), max(0, ay - pay),
+                min(ga.shape[1] - max(0, ax - pax), aw + 2 * pax),
+                min(ga.shape[0] - max(0, ay - pay), ah + 2 * pay))
+        bbox_ = (max(0, bx - pbx), max(0, by - pby),
+                 min(gb.shape[1] - max(0, bx - pbx), bw + 2 * pbx),
+                 min(gb.shape[0] - max(0, by - pby), bh + 2 * pby))
+
+        ncc = _pair_ncc(ga, gb, M, abox, tex_a)
+        if ncc < ncc_threshold:
+            continue
+
+        label, ang, sc, flip = classify_transform(M)
+        frac = (aw * ah) / float(ga.shape[0] * ga.shape[1])
+        if frac < 0.6:
+            label = '局部' + label if label != '平移' else '局部平移/拼接'
+
+        def _back(box, s):
+            x, y, w_, h_ = box
+            inv = 1.0 / s if s < 1 else 1.0
+            return [int(round(x * inv)), int(round(y * inv)),
+                    int(round(w_ * inv)), int(round(h_ * inv))]
+
+        out.append(RegionMatch(
+            a_bbox=_back(abox, scale_a), b_bbox=_back(bbox_, scale_b),
+            transform=label, rotation_deg=round(ang, 1), scale=round(sc, 3),
+            flip=flip, n_inliers=int(len(idx)), ncc=round(ncc, 4),
+            score=round(float(ncc) * min(1.0, len(idx) / (min_inliers * 3)), 4),
+            meta={'M': M.tolist(), 'coverage': round(frac, 3)},
+        ))
+
+    return dedupe_matches(out)
+
+
 # ---------------------------------------------------------------- 主流程
 def _apply_affine_bbox(M: np.ndarray, box: Tuple[int, int, int, int],
                        shape: Tuple[int, int]) -> Tuple[int, int, int, int]:
     """把 box 的四个角经 M 变换后取包围盒"""
     h, w = shape
-    x, y, bw, bh = box
-    pts = np.array([[x, y], [x + bw, y], [x, y + bh], [x + bw, y + bh]], np.float32)
-    t = (M[:, :2] @ pts.T).T + M[:, 2]
-    x0, y0 = float(t[:, 0].min()), float(t[:, 1].min())
-    x1, y1 = float(t[:, 0].max()), float(t[:, 1].max())
-    x0, y0 = max(0, int(np.floor(x0))), max(0, int(np.floor(y0)))
-    x1, y1 = min(w, int(np.ceil(x1))), min(h, int(np.ceil(y1)))
-    return (x0, y0, max(1, x1 - x0), max(1, y1 - y0))
-
-
-# ---------------------------------------------------------------- 主流程
 
 
 def find_region_matches(gray: np.ndarray,

@@ -1,27 +1,28 @@
 {
- "detector": "v3m",
- "label": "v3m_onmaster",
+ "detector": "v4",
+ "label": "v5_onmaster",
  "data": "D:\\Github\\image_dedup\\bench\\data_master",
- "wall_s": 50.41,
+ "wall_s": 34.66,
  "timings": {
-  "load_s": null,
-  "detect_s": 48.21,
-  "total_s": 48.21
+  "load_s": 2.17,
+  "detect_s": 30.97,
+  "intra_s": 0.0,
+  "total_s": 33.13
  },
  "memory": {
-  "rss_start_mb": 53.6,
-  "rss_peak_mb": 737.9
+  "rss_start_mb": 50.2,
+  "rss_peak_mb": 263.4
  },
  "n_images": 450,
  "error": null,
  "cross": {
   "overall": {
-   "tp": 2437,
-   "fp": 206,
-   "fn": 323,
-   "precision": 0.9221,
-   "recall": 0.883,
-   "f1": 0.9021
+   "tp": 2482,
+   "fp": 117,
+   "fn": 278,
+   "precision": 0.955,
+   "recall": 0.8993,
+   "f1": 0.9263
   },
   "by_transform": {
    "base|brightness_70": {
@@ -65,9 +66,9 @@
     "recall": 1.0
    },
    "base|rot_free": {
-    "hit": 30,
+    "hit": 29,
     "total": 30,
-    "recall": 1.0
+    "recall": 0.967
    },
    "base|rotate180": {
     "hit": 30,
@@ -180,9 +181,9 @@
     "recall": 1.0
    },
    "contrast_150|rot_free": {
-    "hit": 29,
+    "hit": 28,
     "total": 30,
-    "recall": 0.967
+    "recall": 0.933
    },
    "contrast_150|rotate180": {
     "hit": 30,
@@ -215,14 +216,14 @@
     "recall": 1.0
    },
    "copy_move|flip_h": {
-    "hit": 3,
+    "hit": 30,
     "total": 30,
-    "recall": 0.1
+    "recall": 1.0
    },
    "copy_move|flip_v": {
-    "hit": 4,
+    "hit": 30,
     "total": 30,
-    "recall": 0.133
+    "recall": 1.0
    },
    "copy_move|jpeg_blur": {
     "hit": 30,
@@ -230,9 +231,9 @@
     "recall": 1.0
    },
    "copy_move|rot_free": {
-    "hit": 29,
+    "hit": 28,
     "total": 30,
-    "recall": 0.967
+    "recall": 0.933
    },
    "copy_move|rotate180": {
     "hit": 30,
@@ -270,14 +271,14 @@
     "recall": 0.0
    },
    "crop_60|jpeg_blur": {
-    "hit": 29,
+    "hit": 30,
     "total": 30,
-    "recall": 0.967
+    "recall": 1.0
    },
    "crop_60|rot_free": {
-    "hit": 10,
+    "hit": 6,
     "total": 30,
-    "recall": 0.333
+    "recall": 0.2
    },
    "crop_60|rotate180": {
     "hit": 30,
@@ -295,9 +296,9 @@
     "recall": 1.0
    },
    "crop_60|scale_07": {
-    "hit": 24,
+    "hit": 30,
     "total": 30,
-    "recall": 0.8
+    "recall": 1.0
    },
    "exact_copy|flip_h": {
     "hit": 30,
@@ -315,9 +316,9 @@
     "recall": 1.0
    },
    "exact_copy|rot_free": {
-    "hit": 30,
+    "hit": 29,
     "total": 30,
-    "recall": 1.0
+    "recall": 0.967
    },
    "exact_copy|rotate180": {
     "hit": 30,
@@ -360,14 +361,14 @@
     "recall": 1.0
    },
    "flip_h|rotate270": {
-    "hit": 1,
+    "hit": 0,
     "total": 30,
-    "recall": 0.033
+    "recall": 0.0
    },
    "flip_h|rotate90": {
-    "hit": 1,
+    "hit": 0,
     "total": 30,
-    "recall": 0.033
+    "recall": 0.0
    },
    "flip_h|scale_07": {
     "hit": 30,
@@ -390,14 +391,14 @@
     "recall": 1.0
    },
    "flip_v|rotate270": {
-    "hit": 1,
+    "hit": 0,
     "total": 30,
-    "recall": 0.033
+    "recall": 0.0
    },
    "flip_v|rotate90": {
-    "hit": 1,
+    "hit": 0,
     "total": 30,
-    "recall": 0.033
+    "recall": 0.0
    },
    "flip_v|scale_07": {
     "hit": 30,
@@ -405,9 +406,9 @@
     "recall": 1.0
    },
    "jpeg_blur|rot_free": {
-    "hit": 29,
+    "hit": 27,
     "total": 30,
-    "recall": 0.967
+    "recall": 0.9
    },
    "jpeg_blur|rotate180": {
     "hit": 30,
@@ -430,24 +431,24 @@
     "recall": 1.0
    },
    "rot_free|rotate180": {
-    "hit": 30,
+    "hit": 29,
     "total": 30,
-    "recall": 1.0
+    "recall": 0.967
    },
    "rot_free|rotate270": {
-    "hit": 30,
+    "hit": 29,
     "total": 30,
-    "recall": 1.0
+    "recall": 0.967
    },
    "rot_free|rotate90": {
+    "hit": 29,
+    "total": 30,
+    "recall": 0.967
+   },
+   "rot_free|scale_07": {
     "hit": 30,
     "total": 30,
     "recall": 1.0
-   },
-   "rot_free|scale_07": {
-    "hit": 28,
-    "total": 30,
-    "recall": 0.933
    },
    "rotate180|rotate270": {
     "hit": 30,
@@ -487,24 +488,12 @@
   },
   "by_naming": {
    "master": {
-    "hit": 2437,
+    "hit": 2482,
     "total": 2760,
-    "recall": 0.883
+    "recall": 0.899
    }
   },
   "missed_positives": [
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0000.png",
-    "b": "flip_h_0000.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0000.png",
-    "b": "flip_v_0000.png"
-   },
    {
     "transform": "crop_60|flip_h",
     "naming": "master",
@@ -614,12 +603,6 @@
     "b": "rotate90_0001.png"
    },
    {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0002.png",
-    "b": "flip_h_0002.png"
-   },
-   {
     "transform": "crop_60|flip_h",
     "naming": "master",
     "a": "crop_60_0002.png",
@@ -668,16 +651,10 @@
     "b": "rotate90_0002.png"
    },
    {
-    "transform": "copy_move|flip_h",
+    "transform": "brightness_70|rot_free",
     "naming": "master",
-    "a": "copy_move_0003.png",
-    "b": "flip_h_0003.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0003.png",
-    "b": "flip_v_0003.png"
+    "a": "brightness_70_0003.png",
+    "b": "rot_free_0003.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -728,18 +705,6 @@
     "b": "rotate90_0003.png"
    },
    {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0004.png",
-    "b": "flip_h_0004.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0004.png",
-    "b": "flip_v_0004.png"
-   },
-   {
     "transform": "crop_60|flip_h",
     "naming": "master",
     "a": "crop_60_0004.png",
@@ -750,12 +715,6 @@
     "naming": "master",
     "a": "crop_60_0004.png",
     "b": "flip_v_0004.png"
-   },
-   {
-    "transform": "crop_60|jpeg_blur",
-    "naming": "master",
-    "a": "crop_60_0004.png",
-    "b": "jpeg_blur_0004.png"
    },
    {
     "transform": "crop_60|rot_free",
@@ -764,12 +723,6 @@
     "b": "rot_free_0004.png"
    },
    {
-    "transform": "crop_60|scale_07",
-    "naming": "master",
-    "a": "crop_60_0004.png",
-    "b": "scale_07_0004.png"
-   },
-   {
     "transform": "flip_h|rot_free",
     "naming": "master",
     "a": "flip_h_0004.png",
@@ -804,18 +757,6 @@
     "naming": "master",
     "a": "flip_v_0004.png",
     "b": "rotate90_0004.png"
-   },
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0005.png",
-    "b": "flip_h_0005.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0005.png",
-    "b": "flip_v_0005.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -872,22 +813,16 @@
     "b": "rotate90_0005.png"
    },
    {
-    "transform": "rot_free|scale_07",
+    "transform": "jpeg_blur|rot_free",
     "naming": "master",
-    "a": "rot_free_0005.png",
-    "b": "scale_07_0005.png"
+    "a": "jpeg_blur_0005.png",
+    "b": "rot_free_0005.png"
    },
    {
-    "transform": "copy_move|flip_h",
+    "transform": "contrast_150|rot_free",
     "naming": "master",
-    "a": "copy_move_0006.png",
-    "b": "flip_h_0006.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0006.png",
-    "b": "flip_v_0006.png"
+    "a": "contrast_150_0006.png",
+    "b": "rot_free_0006.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -944,18 +879,6 @@
     "b": "rotate90_0006.png"
    },
    {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0007.png",
-    "b": "flip_h_0007.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0007.png",
-    "b": "flip_v_0007.png"
-   },
-   {
     "transform": "crop_60|flip_h",
     "naming": "master",
     "a": "crop_60_0007.png",
@@ -972,12 +895,6 @@
     "naming": "master",
     "a": "crop_60_0007.png",
     "b": "rot_free_0007.png"
-   },
-   {
-    "transform": "crop_60|scale_07",
-    "naming": "master",
-    "a": "crop_60_0007.png",
-    "b": "scale_07_0007.png"
    },
    {
     "transform": "flip_h|rot_free",
@@ -1014,18 +931,6 @@
     "naming": "master",
     "a": "flip_v_0007.png",
     "b": "rotate90_0007.png"
-   },
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0008.png",
-    "b": "flip_h_0008.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0008.png",
-    "b": "flip_v_0008.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -1080,18 +985,6 @@
     "naming": "master",
     "a": "flip_v_0008.png",
     "b": "rotate90_0008.png"
-   },
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0009.png",
-    "b": "flip_h_0009.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0009.png",
-    "b": "flip_v_0009.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -1166,22 +1059,40 @@
     "b": "rot_free_0010.png"
    },
    {
+    "transform": "flip_h|rotate270",
+    "naming": "master",
+    "a": "flip_h_0010.png",
+    "b": "rotate270_0010.png"
+   },
+   {
+    "transform": "flip_h|rotate90",
+    "naming": "master",
+    "a": "flip_h_0010.png",
+    "b": "rotate90_0010.png"
+   },
+   {
     "transform": "flip_v|rot_free",
     "naming": "master",
     "a": "flip_v_0010.png",
     "b": "rot_free_0010.png"
    },
    {
-    "transform": "copy_move|flip_h",
+    "transform": "flip_v|rotate270",
     "naming": "master",
-    "a": "copy_move_0011.png",
-    "b": "flip_h_0011.png"
+    "a": "flip_v_0010.png",
+    "b": "rotate270_0010.png"
    },
    {
-    "transform": "copy_move|flip_v",
+    "transform": "flip_v|rotate90",
     "naming": "master",
-    "a": "copy_move_0011.png",
-    "b": "flip_v_0011.png"
+    "a": "flip_v_0010.png",
+    "b": "rotate90_0010.png"
+   },
+   {
+    "transform": "contrast_150|rot_free",
+    "naming": "master",
+    "a": "contrast_150_0011.png",
+    "b": "rot_free_0011.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -1194,6 +1105,12 @@
     "naming": "master",
     "a": "crop_60_0011.png",
     "b": "flip_v_0011.png"
+   },
+   {
+    "transform": "crop_60|rot_free",
+    "naming": "master",
+    "a": "crop_60_0011.png",
+    "b": "rot_free_0011.png"
    },
    {
     "transform": "flip_h|rot_free",
@@ -1230,24 +1147,6 @@
     "naming": "master",
     "a": "flip_v_0011.png",
     "b": "rotate90_0011.png"
-   },
-   {
-    "transform": "rot_free|scale_07",
-    "naming": "master",
-    "a": "rot_free_0011.png",
-    "b": "scale_07_0011.png"
-   },
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0012.png",
-    "b": "flip_h_0012.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0012.png",
-    "b": "flip_v_0012.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -1304,18 +1203,6 @@
     "b": "rotate90_0012.png"
    },
    {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0013.png",
-    "b": "flip_h_0013.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0013.png",
-    "b": "flip_v_0013.png"
-   },
-   {
     "transform": "crop_60|flip_h",
     "naming": "master",
     "a": "crop_60_0013.png",
@@ -1368,18 +1255,6 @@
     "naming": "master",
     "a": "flip_v_0013.png",
     "b": "rotate90_0013.png"
-   },
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0014.png",
-    "b": "flip_h_0014.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0014.png",
-    "b": "flip_v_0014.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -1436,18 +1311,6 @@
     "b": "rotate90_0014.png"
    },
    {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0015.png",
-    "b": "flip_h_0015.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0015.png",
-    "b": "flip_v_0015.png"
-   },
-   {
     "transform": "crop_60|flip_h",
     "naming": "master",
     "a": "crop_60_0015.png",
@@ -1458,6 +1321,12 @@
     "naming": "master",
     "a": "crop_60_0015.png",
     "b": "flip_v_0015.png"
+   },
+   {
+    "transform": "crop_60|rot_free",
+    "naming": "master",
+    "a": "crop_60_0015.png",
+    "b": "rot_free_0015.png"
    },
    {
     "transform": "flip_h|rot_free",
@@ -1494,18 +1363,6 @@
     "naming": "master",
     "a": "flip_v_0015.png",
     "b": "rotate90_0015.png"
-   },
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0016.png",
-    "b": "flip_h_0016.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0016.png",
-    "b": "flip_v_0016.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -1562,18 +1419,6 @@
     "b": "rotate90_0016.png"
    },
    {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0017.png",
-    "b": "flip_h_0017.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0017.png",
-    "b": "flip_v_0017.png"
-   },
-   {
     "transform": "crop_60|flip_h",
     "naming": "master",
     "a": "crop_60_0017.png",
@@ -1628,18 +1473,6 @@
     "b": "rotate90_0017.png"
    },
    {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0018.png",
-    "b": "flip_h_0018.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0018.png",
-    "b": "flip_v_0018.png"
-   },
-   {
     "transform": "crop_60|flip_h",
     "naming": "master",
     "a": "crop_60_0018.png",
@@ -1688,18 +1521,6 @@
     "b": "rotate90_0018.png"
    },
    {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0019.png",
-    "b": "flip_h_0019.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0019.png",
-    "b": "flip_v_0019.png"
-   },
-   {
     "transform": "crop_60|flip_h",
     "naming": "master",
     "a": "crop_60_0019.png",
@@ -1712,10 +1533,10 @@
     "b": "flip_v_0019.png"
    },
    {
-    "transform": "crop_60|scale_07",
+    "transform": "crop_60|rot_free",
     "naming": "master",
     "a": "crop_60_0019.png",
-    "b": "scale_07_0019.png"
+    "b": "rot_free_0019.png"
    },
    {
     "transform": "flip_h|rot_free",
@@ -1760,18 +1581,6 @@
     "b": "rot_free_0019.png"
    },
    {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0020.png",
-    "b": "flip_h_0020.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0020.png",
-    "b": "flip_v_0020.png"
-   },
-   {
     "transform": "crop_60|flip_h",
     "naming": "master",
     "a": "crop_60_0020.png",
@@ -1820,16 +1629,10 @@
     "b": "rotate90_0020.png"
    },
    {
-    "transform": "copy_move|flip_h",
+    "transform": "brightness_70|rot_free",
     "naming": "master",
-    "a": "copy_move_0021.png",
-    "b": "flip_h_0021.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0021.png",
-    "b": "flip_v_0021.png"
+    "a": "brightness_70_0021.png",
+    "b": "rot_free_0021.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -1842,6 +1645,12 @@
     "naming": "master",
     "a": "crop_60_0021.png",
     "b": "flip_v_0021.png"
+   },
+   {
+    "transform": "crop_60|rot_free",
+    "naming": "master",
+    "a": "crop_60_0021.png",
+    "b": "rot_free_0021.png"
    },
    {
     "transform": "flip_h|rot_free",
@@ -1878,18 +1687,6 @@
     "naming": "master",
     "a": "flip_v_0021.png",
     "b": "rotate90_0021.png"
-   },
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0022.png",
-    "b": "flip_h_0022.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0022.png",
-    "b": "flip_v_0022.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -1910,12 +1707,6 @@
     "b": "rot_free_0022.png"
    },
    {
-    "transform": "crop_60|scale_07",
-    "naming": "master",
-    "a": "crop_60_0022.png",
-    "b": "scale_07_0022.png"
-   },
-   {
     "transform": "flip_h|rot_free",
     "naming": "master",
     "a": "flip_h_0022.png",
@@ -1950,24 +1741,6 @@
     "naming": "master",
     "a": "flip_v_0022.png",
     "b": "rotate90_0022.png"
-   },
-   {
-    "transform": "brightness_70|rot_free",
-    "naming": "master",
-    "a": "brightness_70_0023.png",
-    "b": "rot_free_0023.png"
-   },
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0023.png",
-    "b": "flip_h_0023.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0023.png",
-    "b": "flip_v_0023.png"
    },
    {
     "transform": "copy_move|rot_free",
@@ -2030,18 +1803,6 @@
     "b": "rotate90_0023.png"
    },
    {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0024.png",
-    "b": "flip_h_0024.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0024.png",
-    "b": "flip_v_0024.png"
-   },
-   {
     "transform": "crop_60|flip_h",
     "naming": "master",
     "a": "crop_60_0024.png",
@@ -2088,24 +1849,6 @@
     "naming": "master",
     "a": "flip_v_0024.png",
     "b": "rotate90_0024.png"
-   },
-   {
-    "transform": "contrast_150|rot_free",
-    "naming": "master",
-    "a": "contrast_150_0025.png",
-    "b": "rot_free_0025.png"
-   },
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0025.png",
-    "b": "flip_h_0025.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0025.png",
-    "b": "flip_v_0025.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -2126,12 +1869,6 @@
     "b": "rot_free_0025.png"
    },
    {
-    "transform": "crop_60|scale_07",
-    "naming": "master",
-    "a": "crop_60_0025.png",
-    "b": "scale_07_0025.png"
-   },
-   {
     "transform": "flip_h|rot_free",
     "naming": "master",
     "a": "flip_h_0025.png",
@@ -2166,18 +1903,6 @@
     "naming": "master",
     "a": "flip_v_0025.png",
     "b": "rotate90_0025.png"
-   },
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0026.png",
-    "b": "flip_h_0026.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0026.png",
-    "b": "flip_v_0026.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -2234,16 +1959,16 @@
     "b": "rotate90_0026.png"
    },
    {
-    "transform": "copy_move|flip_h",
+    "transform": "base|rot_free",
     "naming": "master",
-    "a": "copy_move_0027.png",
-    "b": "flip_h_0027.png"
+    "a": "base_0027.png",
+    "b": "rot_free_0027.png"
    },
    {
-    "transform": "copy_move|flip_v",
+    "transform": "copy_move|rot_free",
     "naming": "master",
     "a": "copy_move_0027.png",
-    "b": "flip_v_0027.png"
+    "b": "rot_free_0027.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -2264,10 +1989,10 @@
     "b": "rot_free_0027.png"
    },
    {
-    "transform": "crop_60|scale_07",
+    "transform": "exact_copy|rot_free",
     "naming": "master",
-    "a": "crop_60_0027.png",
-    "b": "scale_07_0027.png"
+    "a": "exact_copy_0027.png",
+    "b": "rot_free_0027.png"
    },
    {
     "transform": "flip_h|rot_free",
@@ -2306,10 +2031,28 @@
     "b": "rotate90_0027.png"
    },
    {
-    "transform": "brightness_70|rot_free",
+    "transform": "jpeg_blur|rot_free",
     "naming": "master",
-    "a": "brightness_70_0028.png",
-    "b": "rot_free_0028.png"
+    "a": "jpeg_blur_0027.png",
+    "b": "rot_free_0027.png"
+   },
+   {
+    "transform": "rot_free|rotate180",
+    "naming": "master",
+    "a": "rot_free_0027.png",
+    "b": "rotate180_0027.png"
+   },
+   {
+    "transform": "rot_free|rotate270",
+    "naming": "master",
+    "a": "rot_free_0027.png",
+    "b": "rotate270_0027.png"
+   },
+   {
+    "transform": "rot_free|rotate90",
+    "naming": "master",
+    "a": "rot_free_0027.png",
+    "b": "rotate90_0027.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -2364,18 +2107,6 @@
     "naming": "master",
     "a": "flip_v_0028.png",
     "b": "rotate90_0028.png"
-   },
-   {
-    "transform": "copy_move|flip_h",
-    "naming": "master",
-    "a": "copy_move_0029.png",
-    "b": "flip_h_0029.png"
-   },
-   {
-    "transform": "copy_move|flip_v",
-    "naming": "master",
-    "a": "copy_move_0029.png",
-    "b": "flip_v_0029.png"
    },
    {
     "transform": "crop_60|flip_h",
@@ -2434,71 +2165,11 @@
   ],
   "false_positives": [
    [
-    "cross/all/copy_move_0017.png",
-    "cross/all/splice_0016.png"
-   ],
-   [
-    "cross/all/crop_60_0020.png",
-    "cross/all/splice_0019.png"
-   ],
-   [
-    "cross/all/rotate270_0019.png",
-    "cross/all/splice_0018.png"
-   ],
-   [
     "cross/all/rotate270_0011.png",
     "cross/all/splice_0010.png"
    ],
    [
-    "cross/all/contrast_150_0026.png",
-    "cross/all/splice_0025.png"
-   ],
-   [
-    "cross/all/exact_copy_0019.png",
-    "cross/all/splice_0018.png"
-   ],
-   [
-    "cross/all/exact_copy_0009.png",
-    "cross/all/jpeg_blur_0010.png"
-   ],
-   [
-    "cross/all/base_0017.png",
-    "cross/all/splice_0016.png"
-   ],
-   [
-    "cross/all/rotate270_0028.png",
-    "cross/all/splice_0027.png"
-   ],
-   [
-    "cross/all/rotate90_0019.png",
-    "cross/all/splice_0018.png"
-   ],
-   [
-    "cross/all/contrast_150_0011.png",
-    "cross/all/splice_0010.png"
-   ],
-   [
-    "cross/all/brightness_70_0004.png",
-    "cross/all/brightness_70_0023.png"
-   ],
-   [
-    "cross/all/contrast_150_0024.png",
-    "cross/all/splice_0023.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0007.png",
-    "cross/all/jpeg_blur_0017.png"
-   ],
-   [
-    "cross/all/base_0029.png",
-    "cross/all/splice_0028.png"
-   ],
-   [
-    "cross/all/brightness_70_0026.png",
-    "cross/all/splice_0025.png"
-   ],
-   [
-    "cross/all/rotate180_0024.png",
+    "cross/all/copy_move_0024.png",
     "cross/all/splice_0023.png"
    ],
    [
@@ -2506,615 +2177,319 @@
     "cross/all/splice_0009.png"
    ],
    [
-    "cross/all/brightness_70_0024.png",
-    "cross/all/splice_0023.png"
-   ],
-   [
-    "cross/all/rotate90_0017.png",
-    "cross/all/splice_0016.png"
-   ],
-   [
-    "cross/all/base_0005.png",
-    "cross/all/splice_0004.png"
-   ],
-   [
-    "cross/all/copy_move_0018.png",
-    "cross/all/splice_0017.png"
-   ],
-   [
-    "cross/all/rotate180_0028.png",
-    "cross/all/splice_0027.png"
-   ],
-   [
-    "cross/all/rotate270_0002.png",
-    "cross/all/splice_0001.png"
-   ],
-   [
-    "cross/all/rot_free_0010.png",
-    "cross/all/splice_0009.png"
-   ],
-   [
-    "cross/all/rotate180_0018.png",
-    "cross/all/splice_0017.png"
-   ],
-   [
-    "cross/all/crop_60_0029.png",
-    "cross/all/splice_0028.png"
-   ],
-   [
-    "cross/all/exact_copy_0013.png",
-    "cross/all/splice_0012.png"
-   ],
-   [
-    "cross/all/exact_copy_0005.png",
-    "cross/all/splice_0004.png"
-   ],
-   [
-    "cross/all/exact_copy_0009.png",
-    "cross/all/splice_0008.png"
-   ],
-   [
-    "cross/all/contrast_150_0013.png",
-    "cross/all/splice_0012.png"
-   ],
-   [
-    "cross/all/brightness_70_0003.png",
-    "cross/all/splice_0002.png"
-   ],
-   [
-    "cross/all/rotate270_0009.png",
-    "cross/all/splice_0008.png"
-   ],
-   [
-    "cross/all/exact_copy_0023.png",
-    "cross/all/splice_0022.png"
-   ],
-   [
-    "cross/all/copy_move_0022.png",
+    "cross/all/rotate270_0022.png",
     "cross/all/splice_0021.png"
-   ],
-   [
-    "cross/all/flip_v_0010.png",
-    "cross/all/jpeg_blur_0027.png"
-   ],
-   [
-    "cross/all/exact_copy_0024.png",
-    "cross/all/splice_0023.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0009.png",
-    "cross/all/scale_07_0027.png"
-   ],
-   [
-    "cross/all/rotate270_0018.png",
-    "cross/all/splice_0017.png"
-   ],
-   [
-    "cross/all/contrast_150_0023.png",
-    "cross/all/splice_0022.png"
-   ],
-   [
-    "cross/all/copy_move_0029.png",
-    "cross/all/splice_0028.png"
-   ],
-   [
-    "cross/all/rotate90_0009.png",
-    "cross/all/splice_0008.png"
-   ],
-   [
-    "cross/all/crop_60_0011.png",
-    "cross/all/splice_0010.png"
-   ],
-   [
-    "cross/all/rotate90_0011.png",
-    "cross/all/splice_0010.png"
-   ],
-   [
-    "cross/all/rotate180_0022.png",
-    "cross/all/splice_0021.png"
-   ],
-   [
-    "cross/all/base_0026.png",
-    "cross/all/splice_0025.png"
-   ],
-   [
-    "cross/all/brightness_70_0013.png",
-    "cross/all/splice_0012.png"
    ],
    [
     "cross/all/rotate270_0020.png",
     "cross/all/splice_0019.png"
    ],
    [
-    "cross/all/rotate90_0028.png",
-    "cross/all/splice_0027.png"
-   ],
-   [
-    "cross/all/rotate270_0029.png",
-    "cross/all/splice_0028.png"
-   ],
-   [
-    "cross/all/copy_move_0023.png",
-    "cross/all/splice_0022.png"
-   ],
-   [
-    "cross/all/copy_move_0005.png",
-    "cross/all/splice_0004.png"
-   ],
-   [
-    "cross/all/contrast_150_0015.png",
-    "cross/all/splice_0014.png"
-   ],
-   [
-    "cross/all/copy_move_0003.png",
-    "cross/all/splice_0002.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0008.png",
-    "cross/all/splice_0007.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0010.png",
-    "cross/all/splice_0009.png"
-   ],
-   [
-    "cross/all/base_0020.png",
-    "cross/all/splice_0019.png"
-   ],
-   [
-    "cross/all/contrast_150_0018.png",
-    "cross/all/splice_0017.png"
-   ],
-   [
-    "cross/all/crop_60_0002.png",
-    "cross/all/splice_0001.png"
+    "cross/all/base_0022.png",
+    "cross/all/splice_0021.png"
    ],
    [
     "cross/all/rotate90_0029.png",
     "cross/all/splice_0028.png"
    ],
    [
-    "cross/all/crop_60_0008.png",
-    "cross/all/splice_0007.png"
-   ],
-   [
-    "cross/all/brightness_70_0009.png",
-    "cross/all/jpeg_blur_0010.png"
-   ],
-   [
-    "cross/all/rotate180_0023.png",
-    "cross/all/splice_0022.png"
-   ],
-   [
-    "cross/all/brightness_70_0011.png",
-    "cross/all/splice_0010.png"
-   ],
-   [
-    "cross/all/rotate270_0001.png",
-    "cross/all/splice_0000.png"
-   ],
-   [
-    "cross/all/base_0001.png",
-    "cross/all/splice_0000.png"
-   ],
-   [
-    "cross/all/exact_copy_0028.png",
+    "cross/all/rotate90_0028.png",
     "cross/all/splice_0027.png"
-   ],
-   [
-    "cross/all/rotate90_0013.png",
-    "cross/all/splice_0012.png"
-   ],
-   [
-    "cross/all/rotate90_0026.png",
-    "cross/all/splice_0025.png"
-   ],
-   [
-    "cross/all/contrast_150_0002.png",
-    "cross/all/splice_0001.png"
-   ],
-   [
-    "cross/all/exact_copy_0017.png",
-    "cross/all/splice_0016.png"
-   ],
-   [
-    "cross/all/brightness_70_0024.png",
-    "cross/all/scale_07_0019.png"
-   ],
-   [
-    "cross/all/contrast_150_0017.png",
-    "cross/all/splice_0016.png"
-   ],
-   [
-    "cross/all/rotate270_0023.png",
-    "cross/all/splice_0022.png"
-   ],
-   [
-    "cross/all/contrast_150_0006.png",
-    "cross/all/splice_0005.png"
-   ],
-   [
-    "cross/all/exact_copy_0010.png",
-    "cross/all/splice_0009.png"
-   ],
-   [
-    "cross/all/copy_move_0015.png",
-    "cross/all/splice_0014.png"
-   ],
-   [
-    "cross/all/copy_move_0010.png",
-    "cross/all/splice_0009.png"
-   ],
-   [
-    "cross/all/exact_copy_0020.png",
-    "cross/all/splice_0019.png"
-   ],
-   [
-    "cross/all/brightness_70_0005.png",
-    "cross/all/splice_0004.png"
-   ],
-   [
-    "cross/all/copy_move_0009.png",
-    "cross/all/splice_0008.png"
-   ],
-   [
-    "cross/all/flip_h_0004.png",
-    "cross/all/flip_h_0009.png"
-   ],
-   [
-    "cross/all/brightness_70_0007.png",
-    "cross/all/splice_0006.png"
-   ],
-   [
-    "cross/all/exact_copy_0002.png",
-    "cross/all/splice_0001.png"
-   ],
-   [
-    "cross/all/rotate90_0005.png",
-    "cross/all/splice_0004.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0027.png",
-    "cross/all/scale_07_0004.png"
-   ],
-   [
-    "cross/all/flip_v_0010.png",
-    "cross/all/rot_free_0004.png"
-   ],
-   [
-    "cross/all/rotate90_0015.png",
-    "cross/all/splice_0014.png"
-   ],
-   [
-    "cross/all/crop_60_0018.png",
-    "cross/all/splice_0017.png"
-   ],
-   [
-    "cross/all/rotate90_0008.png",
-    "cross/all/splice_0007.png"
-   ],
-   [
-    "cross/all/contrast_150_0005.png",
-    "cross/all/splice_0004.png"
-   ],
-   [
-    "cross/all/rotate180_0009.png",
-    "cross/all/splice_0008.png"
-   ],
-   [
-    "cross/all/crop_60_0001.png",
-    "cross/all/splice_0000.png"
-   ],
-   [
-    "cross/all/brightness_70_0002.png",
-    "cross/all/splice_0001.png"
-   ],
-   [
-    "cross/all/rotate90_0018.png",
-    "cross/all/splice_0017.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0009.png",
-    "cross/all/splice_0008.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0010.png",
-    "cross/all/rotate270_0009.png"
-   ],
-   [
-    "cross/all/brightness_70_0020.png",
-    "cross/all/splice_0019.png"
-   ],
-   [
-    "cross/all/base_0010.png",
-    "cross/all/splice_0009.png"
-   ],
-   [
-    "cross/all/rotate90_0010.png",
-    "cross/all/splice_0009.png"
-   ],
-   [
-    "cross/all/rotate90_0020.png",
-    "cross/all/splice_0019.png"
-   ],
-   [
-    "cross/all/base_0024.png",
-    "cross/all/splice_0023.png"
-   ],
-   [
-    "cross/all/rotate270_0005.png",
-    "cross/all/splice_0004.png"
-   ],
-   [
-    "cross/all/base_0002.png",
-    "cross/all/splice_0001.png"
-   ],
-   [
-    "cross/all/rotate180_0015.png",
-    "cross/all/splice_0014.png"
-   ],
-   [
-    "cross/all/crop_60_0028.png",
-    "cross/all/splice_0027.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0029.png",
-    "cross/all/splice_0028.png"
-   ],
-   [
-    "cross/all/crop_60_0013.png",
-    "cross/all/splice_0012.png"
-   ],
-   [
-    "cross/all/exact_copy_0001.png",
-    "cross/all/splice_0000.png"
-   ],
-   [
-    "cross/all/rotate180_0020.png",
-    "cross/all/splice_0019.png"
-   ],
-   [
-    "cross/all/rotate270_0008.png",
-    "cross/all/splice_0007.png"
-   ],
-   [
-    "cross/all/rotate180_0029.png",
-    "cross/all/splice_0028.png"
-   ],
-   [
-    "cross/all/copy_move_0024.png",
-    "cross/all/splice_0023.png"
-   ],
-   [
-    "cross/all/base_0003.png",
-    "cross/all/splice_0002.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0009.png",
-    "cross/all/jpeg_blur_0010.png"
-   ],
-   [
-    "cross/all/base_0013.png",
-    "cross/all/splice_0012.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0011.png",
-    "cross/all/splice_0010.png"
    ],
    [
     "cross/all/brightness_70_0028.png",
     "cross/all/splice_0027.png"
    ],
    [
-    "cross/all/rotate90_0002.png",
-    "cross/all/splice_0001.png"
-   ],
-   [
-    "cross/all/rotate180_0005.png",
-    "cross/all/splice_0004.png"
-   ],
-   [
-    "cross/all/copy_move_0020.png",
-    "cross/all/splice_0019.png"
-   ],
-   [
-    "cross/all/contrast_150_0001.png",
-    "cross/all/splice_0000.png"
-   ],
-   [
-    "cross/all/brightness_70_0011.png",
-    "cross/all/jpeg_blur_0008.png"
-   ],
-   [
-    "cross/all/brightness_70_0023.png",
-    "cross/all/splice_0022.png"
-   ],
-   [
-    "cross/all/rotate90_0003.png",
-    "cross/all/splice_0002.png"
-   ],
-   [
-    "cross/all/contrast_150_0022.png",
-    "cross/all/splice_0021.png"
-   ],
-   [
-    "cross/all/contrast_150_0029.png",
-    "cross/all/splice_0028.png"
-   ],
-   [
-    "cross/all/brightness_70_0015.png",
-    "cross/all/splice_0014.png"
-   ],
-   [
-    "cross/all/contrast_150_0014.png",
-    "cross/all/splice_0013.png"
-   ],
-   [
-    "cross/all/copy_move_0013.png",
-    "cross/all/splice_0012.png"
-   ],
-   [
-    "cross/all/rotate90_0022.png",
-    "cross/all/splice_0021.png"
-   ],
-   [
-    "cross/all/crop_60_0022.png",
-    "cross/all/splice_0021.png"
-   ],
-   [
-    "cross/all/rotate180_0026.png",
-    "cross/all/splice_0025.png"
-   ],
-   [
-    "cross/all/rotate270_0010.png",
-    "cross/all/splice_0009.png"
-   ],
-   [
-    "cross/all/crop_60_0017.png",
-    "cross/all/splice_0016.png"
-   ],
-   [
-    "cross/all/copy_move_0011.png",
+    "cross/all/crop_60_0011.png",
     "cross/all/splice_0010.png"
    ],
    [
-    "cross/all/contrast_150_0009.png",
-    "cross/all/splice_0008.png"
-   ],
-   [
-    "cross/all/brightness_70_0014.png",
-    "cross/all/splice_0013.png"
-   ],
-   [
-    "cross/all/rotate180_0013.png",
+    "cross/all/base_0013.png",
     "cross/all/splice_0012.png"
    ],
    [
-    "cross/all/jpeg_blur_0018.png",
-    "cross/all/splice_0017.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0001.png",
-    "cross/all/splice_0000.png"
-   ],
-   [
-    "cross/all/contrast_150_0027.png",
-    "cross/all/splice_0026.png"
-   ],
-   [
-    "cross/all/flip_v_0010.png",
-    "cross/all/jpeg_blur_0009.png"
-   ],
-   [
-    "cross/all/base_0018.png",
-    "cross/all/splice_0017.png"
-   ],
-   [
-    "cross/all/exact_copy_0003.png",
-    "cross/all/splice_0002.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0013.png",
-    "cross/all/splice_0012.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0010.png",
-    "cross/all/rotate180_0009.png"
-   ],
-   [
-    "cross/all/copy_move_0026.png",
-    "cross/all/splice_0025.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0028.png",
+    "cross/all/rotate180_0028.png",
     "cross/all/splice_0027.png"
    ],
    [
-    "cross/all/brightness_70_0004.png",
-    "cross/all/scale_07_0008.png"
+    "cross/all/copy_move_0010.png",
+    "cross/all/splice_0009.png"
    ],
    [
-    "cross/all/rotate180_0003.png",
-    "cross/all/splice_0002.png"
-   ],
-   [
-    "cross/all/exact_copy_0029.png",
-    "cross/all/splice_0028.png"
-   ],
-   [
-    "cross/all/rotate270_0013.png",
-    "cross/all/splice_0012.png"
-   ],
-   [
-    "cross/all/exact_copy_0015.png",
-    "cross/all/splice_0014.png"
-   ],
-   [
-    "cross/all/rotate270_0024.png",
-    "cross/all/splice_0023.png"
-   ],
-   [
-    "cross/all/base_0019.png",
-    "cross/all/splice_0018.png"
-   ],
-   [
-    "cross/all/rotate180_0001.png",
-    "cross/all/splice_0000.png"
-   ],
-   [
-    "cross/all/exact_copy_0018.png",
-    "cross/all/splice_0017.png"
-   ],
-   [
-    "cross/all/exact_copy_0026.png",
-    "cross/all/splice_0025.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0003.png",
-    "cross/all/scale_07_0007.png"
-   ],
-   [
-    "cross/all/copy_move_0028.png",
+    "cross/all/exact_copy_0028.png",
     "cross/all/splice_0027.png"
+   ],
+   [
+    "cross/all/base_0020.png",
+    "cross/all/splice_0019.png"
+   ],
+   [
+    "cross/all/rotate90_0010.png",
+    "cross/all/splice_0009.png"
+   ],
+   [
+    "cross/all/rotate270_0005.png",
+    "cross/all/splice_0004.png"
+   ],
+   [
+    "cross/all/brightness_70_0020.png",
+    "cross/all/splice_0019.png"
    ],
    [
     "cross/all/base_0011.png",
     "cross/all/splice_0010.png"
    ],
    [
-    "cross/all/crop_60_0003.png",
-    "cross/all/splice_0002.png"
+    "cross/all/exact_copy_0013.png",
+    "cross/all/splice_0012.png"
    ],
    [
-    "cross/all/brightness_70_0010.png",
-    "cross/all/jpeg_blur_0003.png"
+    "cross/all/base_0005.png",
+    "cross/all/splice_0004.png"
    ],
    [
-    "cross/all/base_0009.png",
-    "cross/all/splice_0008.png"
+    "cross/all/rotate270_0010.png",
+    "cross/all/splice_0009.png"
+   ],
+   [
+    "cross/all/rotate90_0024.png",
+    "cross/all/splice_0023.png"
+   ],
+   [
+    "cross/all/brightness_70_0018.png",
+    "cross/all/splice_0017.png"
+   ],
+   [
+    "cross/all/contrast_150_0015.png",
+    "cross/all/splice_0014.png"
+   ],
+   [
+    "cross/all/base_0026.png",
+    "cross/all/splice_0025.png"
+   ],
+   [
+    "cross/all/copy_move_0005.png",
+    "cross/all/splice_0004.png"
+   ],
+   [
+    "cross/all/copy_move_0017.png",
+    "cross/all/splice_0016.png"
+   ],
+   [
+    "cross/all/contrast_150_0014.png",
+    "cross/all/splice_0013.png"
+   ],
+   [
+    "cross/all/rotate270_0029.png",
+    "cross/all/splice_0028.png"
+   ],
+   [
+    "cross/all/exact_copy_0022.png",
+    "cross/all/splice_0021.png"
+   ],
+   [
+    "cross/all/base_0002.png",
+    "cross/all/splice_0001.png"
+   ],
+   [
+    "cross/all/brightness_70_0014.png",
+    "cross/all/splice_0013.png"
+   ],
+   [
+    "cross/all/copy_move_0026.png",
+    "cross/all/splice_0025.png"
+   ],
+   [
+    "cross/all/base_0010.png",
+    "cross/all/splice_0009.png"
    ],
    [
     "cross/all/contrast_150_0010.png",
     "cross/all/splice_0009.png"
    ],
    [
-    "cross/all/copy_move_0019.png",
-    "cross/all/splice_0018.png"
+    "cross/all/base_0024.png",
+    "cross/all/splice_0023.png"
    ],
    [
-    "cross/all/crop_60_0005.png",
-    "cross/all/splice_0004.png"
+    "cross/all/exact_copy_0029.png",
+    "cross/all/splice_0028.png"
    ],
    [
-    "cross/all/rotate270_0015.png",
-    "cross/all/splice_0014.png"
+    "cross/all/copy_move_0022.png",
+    "cross/all/splice_0021.png"
    ],
    [
-    "cross/all/rotate180_0017.png",
+    "cross/all/exact_copy_0020.png",
+    "cross/all/splice_0019.png"
+   ],
+   [
+    "cross/all/exact_copy_0026.png",
+    "cross/all/splice_0025.png"
+   ],
+   [
+    "cross/all/rotate270_0028.png",
+    "cross/all/splice_0027.png"
+   ],
+   [
+    "cross/all/contrast_150_0002.png",
+    "cross/all/splice_0001.png"
+   ],
+   [
+    "cross/all/brightness_70_0017.png",
     "cross/all/splice_0016.png"
    ],
    [
-    "cross/all/jpeg_blur_0020.png",
+    "cross/all/brightness_70_0002.png",
+    "cross/all/splice_0001.png"
+   ],
+   [
+    "cross/all/exact_copy_0011.png",
+    "cross/all/splice_0010.png"
+   ],
+   [
+    "cross/all/exact_copy_0002.png",
+    "cross/all/splice_0001.png"
+   ],
+   [
+    "cross/all/copy_move_0011.png",
+    "cross/all/splice_0010.png"
+   ],
+   [
+    "cross/all/brightness_70_0024.png",
+    "cross/all/splice_0023.png"
+   ],
+   [
+    "cross/all/rotate180_0011.png",
+    "cross/all/splice_0010.png"
+   ],
+   [
+    "cross/all/rotate90_0003.png",
+    "cross/all/splice_0002.png"
+   ],
+   [
+    "cross/all/exact_copy_0017.png",
+    "cross/all/splice_0016.png"
+   ],
+   [
+    "cross/all/rotate90_0005.png",
+    "cross/all/splice_0004.png"
+   ],
+   [
+    "cross/all/copy_move_0029.png",
+    "cross/all/splice_0028.png"
+   ],
+   [
+    "cross/all/rotate90_0002.png",
+    "cross/all/splice_0001.png"
+   ],
+   [
+    "cross/all/base_0029.png",
+    "cross/all/splice_0028.png"
+   ],
+   [
+    "cross/all/contrast_150_0008.png",
+    "cross/all/splice_0007.png"
+   ],
+   [
+    "cross/all/copy_move_0013.png",
+    "cross/all/splice_0012.png"
+   ],
+   [
+    "cross/all/copy_move_0001.png",
+    "cross/all/splice_0000.png"
+   ],
+   [
+    "cross/all/rotate90_0011.png",
+    "cross/all/splice_0010.png"
+   ],
+   [
+    "cross/all/rotate90_0013.png",
+    "cross/all/splice_0012.png"
+   ],
+   [
+    "cross/all/contrast_150_0003.png",
+    "cross/all/splice_0002.png"
+   ],
+   [
+    "cross/all/copy_move_0003.png",
+    "cross/all/splice_0002.png"
+   ],
+   [
+    "cross/all/rotate90_0018.png",
+    "cross/all/splice_0017.png"
+   ],
+   [
+    "cross/all/brightness_70_0008.png",
+    "cross/all/splice_0007.png"
+   ],
+   [
+    "cross/all/rotate180_0005.png",
+    "cross/all/splice_0004.png"
+   ],
+   [
+    "cross/all/contrast_150_0011.png",
+    "cross/all/splice_0010.png"
+   ],
+   [
+    "cross/all/rotate90_0022.png",
+    "cross/all/splice_0021.png"
+   ],
+   [
+    "cross/all/contrast_150_0018.png",
+    "cross/all/splice_0017.png"
+   ],
+   [
+    "cross/all/rotate180_0002.png",
+    "cross/all/splice_0001.png"
+   ],
+   [
+    "cross/all/base_0003.png",
+    "cross/all/splice_0002.png"
+   ],
+   [
+    "cross/all/brightness_70_0009.png",
+    "cross/all/splice_0008.png"
+   ],
+   [
+    "cross/all/contrast_150_0009.png",
+    "cross/all/splice_0008.png"
+   ],
+   [
+    "cross/all/contrast_150_0026.png",
+    "cross/all/splice_0025.png"
+   ],
+   [
+    "cross/all/contrast_150_0001.png",
+    "cross/all/splice_0000.png"
+   ],
+   [
+    "cross/all/rotate180_0013.png",
+    "cross/all/splice_0012.png"
+   ],
+   [
+    "cross/all/rotate270_0002.png",
+    "cross/all/splice_0001.png"
+   ],
+   [
+    "cross/all/rotate270_0013.png",
+    "cross/all/splice_0012.png"
+   ],
+   [
+    "cross/all/contrast_150_0017.png",
+    "cross/all/splice_0016.png"
+   ],
+   [
+    "cross/all/base_0001.png",
+    "cross/all/splice_0000.png"
+   ],
+   [
+    "cross/all/rotate90_0017.png",
+    "cross/all/splice_0016.png"
+   ],
+   [
+    "cross/all/crop_60_0020.png",
     "cross/all/splice_0019.png"
    ],
    [
@@ -3122,140 +2497,140 @@
     "cross/all/splice_0027.png"
    ],
    [
-    "cross/all/base_0015.png",
-    "cross/all/splice_0014.png"
+    "cross/all/jpeg_blur_0028.png",
+    "cross/all/splice_0027.png"
    ],
    [
-    "cross/all/jpeg_blur_0004.png",
-    "cross/all/jpeg_blur_0010.png"
-   ],
-   [
-    "cross/all/rotate270_0022.png",
-    "cross/all/splice_0021.png"
-   ],
-   [
-    "cross/all/rotate90_0023.png",
-    "cross/all/splice_0022.png"
-   ],
-   [
-    "cross/all/rotate180_0011.png",
-    "cross/all/splice_0010.png"
-   ],
-   [
-    "cross/all/base_0022.png",
-    "cross/all/splice_0021.png"
-   ],
-   [
-    "cross/all/rotate90_0001.png",
-    "cross/all/splice_0000.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0007.png",
-    "cross/all/jpeg_blur_0008.png"
-   ],
-   [
-    "cross/all/exact_copy_0011.png",
-    "cross/all/splice_0010.png"
-   ],
-   [
-    "cross/all/rotate270_0003.png",
-    "cross/all/splice_0002.png"
-   ],
-   [
-    "cross/all/contrast_150_0020.png",
+    "cross/all/copy_move_0020.png",
     "cross/all/splice_0019.png"
    ],
    [
-    "cross/all/brightness_70_0017.png",
-    "cross/all/splice_0016.png"
+    "cross/all/exact_copy_0001.png",
+    "cross/all/splice_0000.png"
    ],
    [
-    "cross/all/brightness_70_0003.png",
-    "cross/all/brightness_70_0016.png"
-   ],
-   [
-    "cross/all/contrast_150_0003.png",
-    "cross/all/splice_0002.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0024.png",
-    "cross/all/splice_0023.png"
+    "cross/all/base_0008.png",
+    "cross/all/splice_0007.png"
    ],
    [
     "cross/all/brightness_70_0029.png",
     "cross/all/splice_0028.png"
    ],
    [
-    "cross/all/base_0023.png",
-    "cross/all/splice_0022.png"
+    "cross/all/brightness_70_0026.png",
+    "cross/all/splice_0025.png"
+   ],
+   [
+    "cross/all/rotate270_0003.png",
+    "cross/all/splice_0002.png"
+   ],
+   [
+    "cross/all/base_0017.png",
+    "cross/all/splice_0016.png"
+   ],
+   [
+    "cross/all/brightness_70_0013.png",
+    "cross/all/splice_0012.png"
+   ],
+   [
+    "cross/all/rotate270_0024.png",
+    "cross/all/splice_0023.png"
+   ],
+   [
+    "cross/all/exact_copy_0003.png",
+    "cross/all/splice_0002.png"
    ],
    [
     "cross/all/contrast_150_0028.png",
     "cross/all/splice_0027.png"
    ],
    [
-    "cross/all/brightness_70_0018.png",
-    "cross/all/splice_0017.png"
-   ],
-   [
-    "cross/all/scale_07_0023.png",
-    "cross/all/splice_0022.png"
-   ],
-   [
-    "cross/all/rotate180_0008.png",
+    "cross/all/crop_60_0008.png",
     "cross/all/splice_0007.png"
    ],
    [
-    "cross/all/brightness_70_0014.png",
-    "cross/all/crop_60_0001.png"
+    "cross/all/contrast_150_0013.png",
+    "cross/all/splice_0012.png"
    ],
    [
-    "cross/all/crop_60_0024.png",
+    "cross/all/rotate180_0018.png",
+    "cross/all/splice_0017.png"
+   ],
+   [
+    "cross/all/exact_copy_0005.png",
+    "cross/all/splice_0004.png"
+   ],
+   [
+    "cross/all/contrast_150_0020.png",
+    "cross/all/splice_0019.png"
+   ],
+   [
+    "cross/all/crop_60_0028.png",
+    "cross/all/splice_0027.png"
+   ],
+   [
+    "cross/all/rotate180_0029.png",
+    "cross/all/splice_0028.png"
+   ],
+   [
+    "cross/all/brightness_70_0003.png",
+    "cross/all/splice_0002.png"
+   ],
+   [
+    "cross/all/contrast_150_0005.png",
+    "cross/all/splice_0004.png"
+   ],
+   [
+    "cross/all/exact_copy_0008.png",
+    "cross/all/splice_0007.png"
+   ],
+   [
+    "cross/all/contrast_150_0024.png",
     "cross/all/splice_0023.png"
+   ],
+   [
+    "cross/all/exact_copy_0010.png",
+    "cross/all/splice_0009.png"
    ],
    [
     "cross/all/rotate270_0017.png",
     "cross/all/splice_0016.png"
    ],
    [
-    "cross/all/rotate180_0002.png",
-    "cross/all/splice_0001.png"
+    "cross/all/copy_move_0028.png",
+    "cross/all/splice_0027.png"
+   ],
+   [
+    "cross/all/jpeg_blur_0018.png",
+    "cross/all/splice_0017.png"
+   ],
+   [
+    "cross/all/exact_copy_0024.png",
+    "cross/all/splice_0023.png"
+   ],
+   [
+    "cross/all/crop_60_0024.png",
+    "cross/all/splice_0023.png"
+   ],
+   [
+    "cross/all/rotate180_0024.png",
+    "cross/all/splice_0023.png"
+   ],
+   [
+    "cross/all/copy_move_0008.png",
+    "cross/all/splice_0007.png"
    ],
    [
     "cross/all/brightness_70_0010.png",
     "cross/all/splice_0009.png"
    ],
    [
-    "cross/all/brightness_70_0025.png",
-    "cross/all/splice_0024.png"
+    "cross/all/brightness_70_0023.png",
+    "cross/all/splice_0022.png"
    ],
    [
-    "cross/all/flip_h_0010.png",
-    "cross/all/jpeg_blur_0027.png"
-   ],
-   [
-    "cross/all/jpeg_blur_0017.png",
-    "cross/all/splice_0016.png"
-   ],
-   [
-    "cross/all/brightness_70_0009.png",
-    "cross/all/splice_0008.png"
-   ],
-   [
-    "cross/all/exact_copy_0022.png",
-    "cross/all/splice_0021.png"
-   ],
-   [
-    "cross/all/rotate90_0024.png",
+    "cross/all/jpeg_blur_0024.png",
     "cross/all/splice_0023.png"
-   ],
-   [
-    "cross/all/rotate270_0026.png",
-    "cross/all/splice_0025.png"
-   ],
-   [
-    "cross/all/copy_move_0001.png",
-    "cross/all/splice_0000.png"
    ]
   ]
  },

@@ -15,15 +15,15 @@ ORB 描述子天生对旋转与缩放不敏感，于是：
 
 from collections import defaultdict
 from itertools import combinations
-from typing import Dict, List, Sequence, Set, Tuple
+from typing import Dict, Sequence, Tuple
 
 import cv2
 import numpy as np
 
 
 def compute_bow_keys(gray: np.ndarray, max_dim: int = 512,
-                     nfeatures: int = 1000) -> Set[int]:
-    """ORB 描述子前 4 字节构成的词集合"""
+                     nfeatures: int = 1000) -> np.ndarray:
+    """ORB 描述子前 4 字节构成的词集合（去重后的 uint32 数组）""" 
     h, w = gray.shape[:2]
     if max(h, w) > max_dim:
         s = max_dim / max(h, w)
@@ -35,18 +35,20 @@ def compute_bow_keys(gray: np.ndarray, max_dim: int = 512,
         orb = cv2.ORB_create(nfeatures=nfeatures)
         _, des = orb.detectAndCompute(small, None)
     except Exception:
-        return set()
+        return np.zeros(0, np.uint32)
     if des is None or len(des) == 0:
-        return set()
-    return {int(k) for k in des.view(np.uint32).reshape(-1, 8)[:, 0]}
+        return np.zeros(0, np.uint32)
+    return np.unique(des.view(np.uint32).reshape(-1, 8)[:, 0])
 
 
-def bow_candidates(keys: Sequence[Set[int]], min_shared: int = 8,
+def bow_candidates(keys: Sequence[np.ndarray], min_shared: int = 8,
                    max_bucket: int = 3000) -> Dict[Tuple[int, int], int]:
     """倒排索引 → 共享词数 >= min_shared 的图对。返回 {(i,j): 共享词数}"""
     inv = defaultdict(list)
     for i, ks in enumerate(keys):
-        for k in ks:
+        if ks is None:
+            continue
+        for k in ks.tolist():
             inv[k].append(i)
 
     counts: Dict[Tuple[int, int], int] = defaultdict(int)
